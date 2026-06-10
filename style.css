@@ -103,6 +103,32 @@ main p.description {
   margin: 0 0 32px;
 }
 
+.download {
+  margin: 0 0 8px;
+}
+
+.download .play-badge {
+  display: inline-block;
+  margin-left: -10px; /* offset the badge artwork's built-in clear space */
+}
+
+.download .play-badge:hover {
+  opacity: 0.9;
+  text-decoration: none;
+}
+
+.download .play-badge img {
+  display: block;
+  height: 72px;
+  width: auto;
+}
+
+.download .download-note {
+  color: var(--lavender);
+  font-size: 13px;
+  margin: 6px 0 0;
+}
+
 .legal-list,
 .contact {
   margin: 32px 0;
@@ -153,6 +179,13 @@ footer p.copyright {
   color: var(--lavender);
   margin: 12px 0 0;
   opacity: 0.7;
+}
+
+footer p.trademark {
+  color: var(--lavender);
+  font-size: 11px;
+  margin: 6px 0 0;
+  opacity: 0.5;
 }
 
 @media (max-width: 720px) {
