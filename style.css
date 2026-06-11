@@ -47,11 +47,25 @@ header {
 }
 
 header .brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 11px;
   font-size: 22px;
   font-weight: 700;
   color: var(--teal);
   text-decoration: none;
   letter-spacing: -0.5px;
+}
+
+header .brand:hover {
+  text-decoration: none;
+}
+
+header .brand img {
+  width: 30px;
+  height: 30px;
+  border-radius: 7px;
+  display: block;
 }
 
 main {
