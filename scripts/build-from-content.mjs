@@ -117,7 +117,10 @@ function renderPage(title, body, slug) {
   </head>
   <body>
     <header>
-      <a href="/" class="brand">Peptidly</a>
+      <a href="/" class="brand">
+        <img src="/assets/peptidly-mark-80.png" alt="" width="30" height="30">
+        <span>Peptidly</span>
+      </a>
     </header>
     <main>
       <h1>${escapeHtml(title)}</h1>
