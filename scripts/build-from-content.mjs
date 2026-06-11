@@ -112,6 +112,7 @@ function renderPage(title, body, slug) {
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>${escapeHtml(title)} — Peptidly</title>
+    <link rel="icon" type="image/png" href="/assets/favicon.png">
     <link rel="stylesheet" href="style.css">
   </head>
   <body>
