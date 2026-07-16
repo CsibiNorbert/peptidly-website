@@ -28,6 +28,11 @@ const contentTsPath = resolve(projectRoot, '..', 'Peptides', 'helix', 'legal', '
 let source;
 try {
   source = readFileSync(contentTsPath, 'utf8');
+  // Normalize CRLF → LF: a Windows checkout of content.ts otherwise defeats
+  // the \n\n paragraph split and the heading heuristic below (JS template
+  // literals are LF-normalized at parse time, so the APP never sees CRLF —
+  // only this raw-source reader does).
+  source = source.replace(/\r\n/g, '\n');
 } catch (err) {
   console.error('[Build] Could not read source file:', contentTsPath);
   console.error('[Build]', err.message);
