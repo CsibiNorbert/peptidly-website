@@ -1,0 +1,98 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="robots" content="noindex">
+    <title>Unsubscribe — Peptidly</title>
+    <link rel="icon" type="image/png" href="/assets/favicon.png">
+    <link rel="stylesheet" href="style.css">
+    <style>
+      /* Page-local bits only; base look comes from style.css. */
+      .unsub-btn {
+        display: inline-block; background: #00B4D8; color: #04202B;
+        font: 600 15px/1 inherit; padding: 12px 26px; border: 0; border-radius: 12px;
+        cursor: pointer;
+      }
+      .unsub-btn[disabled] { opacity: .5; cursor: default; }
+      .status { margin-top: 18px; font-size: 15px; }
+      .status.ok { color: #0a7d52; }
+      .status.err { color: #b3261e; }
+      .email { font-weight: 600; }
+    </style>
+  </head>
+  <body>
+    <header>
+      <a href="/" class="brand">
+        <img src="/assets/peptidly-mark-80.png" alt="" width="30" height="30">
+        <span>Peptidly</span>
+      </a>
+    </header>
+    <main>
+      <h1>Unsubscribe</h1>
+
+      <!-- Filled by the script from the ?e=&t= link. The page LOAD never writes;
+           only the button POSTs, so email-client link prefetching cannot
+           unsubscribe anyone by accident. -->
+      <div id="prompt" hidden>
+        <p>Stop receiving occasional emails at <span class="email" id="email"></span>? This does not affect your account or your in-app dose reminders.</p>
+        <button class="unsub-btn" id="go" type="button">Unsubscribe</button>
+        <p class="status" id="status" role="status" aria-live="polite"></p>
+      </div>
+
+      <div id="badlink" hidden>
+        <p>This unsubscribe link is incomplete or has been altered. If you keep receiving emails you did not ask for, reply to any Peptidly email — it reaches us directly.</p>
+      </div>
+    </main>
+    <footer>
+      <a href="/privacy">Privacy</a> ·
+      <a href="/terms">Terms</a> ·
+      <a href="/health-disclaimer">Health Disclaimer</a>
+      <p class="copyright">© 2026 Peptidly</p>
+    </footer>
+
+    <script>
+      (function () {
+        var API = 'https://cdgotcpqrwwrfbptdllu.supabase.co/functions/v1/unsubscribe';
+        var params = new URLSearchParams(location.search);
+        var email = params.get('e');
+        var token = params.get('t');
+
+        if (!email || !token) {
+          document.getElementById('badlink').hidden = false;
+          return;
+        }
+
+        // textContent (never innerHTML) — the email is untrusted URL input.
+        document.getElementById('email').textContent = email;
+        document.getElementById('prompt').hidden = false;
+
+        var btn = document.getElementById('go');
+        var status = document.getElementById('status');
+
+        btn.addEventListener('click', function () {
+          btn.disabled = true;
+          status.className = 'status';
+          status.textContent = 'Working…';
+          // Preserve the exact signed query string. Simple POST (no custom
+          // headers / body) → no CORS preflight; the API returns CORS on POST.
+          fetch(API + location.search, { method: 'POST' })
+            .then(function (r) { return r.json().catch(function () { return { ok: r.ok }; }); })
+            .then(function (data) {
+              if (data && data.ok) {
+                status.className = 'status ok';
+                status.textContent = 'Done — you will no longer receive Peptidly emails. Changed your mind? Reply to any past email and we will add you back.';
+              } else {
+                throw new Error('failed');
+              }
+            })
+            .catch(function () {
+              btn.disabled = false;
+              status.className = 'status err';
+              status.textContent = 'Something went wrong. Please try again, or reply to any Peptidly email.';
+            });
+        });
+      })();
+    </script>
+  </body>
+</html>
