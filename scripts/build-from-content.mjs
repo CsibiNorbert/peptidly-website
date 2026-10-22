@@ -40,14 +40,21 @@ try {
   process.exit(1);
 }
 
-// ─── Extract LAST_UPDATED ──────────────────────────────
+// ─── Extract the dates ─────────────────────────────────
+// LAST_UPDATED dates the Terms and the Health Disclaimer; the Privacy Policy
+// has its own PRIVACY_LAST_UPDATED.
 
-const lastUpdatedMatch = source.match(/export const LAST_UPDATED\s*=\s*'([^']+)'/);
-if (!lastUpdatedMatch) {
-  console.error('[Build] Could not find LAST_UPDATED in content.ts');
-  process.exit(1);
+function extractDate(name) {
+  const match = source.match(new RegExp(`export const ${name}\\s*=\\s*'([^']+)'`));
+  if (!match) {
+    console.error(`[Build] Could not find ${name} in content.ts`);
+    process.exit(1);
+  }
+  return match[1];
 }
-const lastUpdated = lastUpdatedMatch[1];
+
+const lastUpdated = extractDate('LAST_UPDATED');
+const privacyLastUpdated = extractDate('PRIVACY_LAST_UPDATED');
 
 // ─── Extract the three template-literal constants ──────
 
@@ -110,7 +117,7 @@ function bodyToHtml(body) {
 }
 
 /** Render a full HTML page for one legal document. */
-function renderPage(title, body, slug) {
+function renderPage(title, body, date) {
   return `<!doctype html>
 <html lang="en">
   <head>
@@ -129,7 +136,7 @@ function renderPage(title, body, slug) {
     </header>
     <main>
       <h1>${escapeHtml(title)}</h1>
-      <p class="last-updated">Last updated: ${escapeHtml(lastUpdated)}</p>
+      <p class="last-updated">Last updated: ${escapeHtml(date)}</p>
 ${bodyToHtml(body)}
     </main>
     <footer>
@@ -146,16 +153,16 @@ ${bodyToHtml(body)}
 // ─── Render and write ──────────────────────────────────
 
 const pages = [
-  { title: 'Privacy Policy', body: privacyBody, file: 'privacy.html' },
-  { title: 'Terms of Service', body: termsBody, file: 'terms.html' },
-  { title: 'Health Disclaimer', body: healthBody, file: 'health-disclaimer.html' },
+  { title: 'Privacy Policy', body: privacyBody, file: 'privacy.html', date: privacyLastUpdated },
+  { title: 'Terms of Service', body: termsBody, file: 'terms.html', date: lastUpdated },
+  { title: 'Health Disclaimer', body: healthBody, file: 'health-disclaimer.html', date: lastUpdated },
 ];
 
 for (const page of pages) {
-  const html = renderPage(page.title, page.body, page.file);
+  const html = renderPage(page.title, page.body, page.date);
   const outPath = resolve(projectRoot, page.file);
   writeFileSync(outPath, html, 'utf8');
   console.log(`[Build] Wrote ${page.file}`);
 }
 
-console.log(`[Build] Generated ${pages.length} legal pages from helix/legal/content.ts (Last updated: ${lastUpdated})`);
+console.log(`[Build] Generated ${pages.length} legal pages from helix/legal/content.ts (Privacy ${privacyLastUpdated}; Terms and Health Disclaimer ${lastUpdated})`);
