@@ -9,7 +9,6 @@ import { parseDecimal, positive, drawTo, reconstitute } from './calc.js';
   document.documentElement.classList.add('js');
 
   var reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
-  var phoneWidth = window.matchMedia('(max-width: 699px)');
   var desktopWidth = window.matchMedia('(min-width: 1100px)');
   var $ = function (sel, root) { return (root || document).querySelector(sel); };
   var $$ = function (sel, root) { return Array.prototype.slice.call((root || document).querySelectorAll(sel)); };
@@ -73,11 +72,10 @@ import { parseDecimal, positive, drawTo, reconstitute } from './calc.js';
     if (!status) return;
     clearTimeout(statusTimer);
     statusTimer = setTimeout(function () {
-      status.textContent = r.units !== null
-        ? 'Draw to ' + drawTo(r.units) + ' units, ' + r.volume.toFixed(3) + ' ml, on a 1 ml insulin syringe.'
-        : r.conc !== null
-          ? 'Concentration ' + r.conc.toFixed(2) + ' mg per ml. Enter a dose to see the draw.'
-          : 'Enter the vial size and the water added.';
+      if (r.units !== null) status.textContent = 'Draw to ' + drawTo(r.units) + ' units, ' + r.volume.toFixed(3) + ' ml, on a 1 ml insulin syringe.';
+      else if (r.conc !== null) status.textContent = 'Concentration ' + r.conc.toFixed(2) + ' mg per ml. Enter a dose to see the draw.';
+      else if (r.dosesPerVial !== null) status.textContent = r.dosesPerVial + ' doses per vial. Enter the BAC water to see the draw.';
+      else status.textContent = 'Enter the vial size, the BAC water and your dose.';
     }, 700);
   }
 
@@ -242,18 +240,6 @@ import { parseDecimal, positive, drawTo, reconstitute } from './calc.js';
     }
   }
 
-  // Measured with the low-stock banner open, so the scale does not change between states.
-  function fitPhone() {
-    if (!phone) return;
-    if (phoneWidth.matches) { phone.style.zoom = ''; return; }
-    phone.style.zoom = '';
-    phone.classList.add('measuring');
-    var natural = phone.offsetHeight;
-    phone.classList.remove('measuring');
-    var room = window.innerHeight * 0.86;
-    phone.style.zoom = natural > room ? String(Math.max(0.6, room / natural)) : '';
-  }
-
   function pulseLog() {
     var b = $('.next-log', phone);
     b.classList.remove('pulse');
@@ -271,8 +257,11 @@ import { parseDecimal, positive, drawTo, reconstitute } from './calc.js';
     render(takenState);
     $('.nudge', phone).setAttribute('aria-hidden', n === 3 ? 'false' : 'true');
     keepFocus();
-    fitPhone();
-    $$('.step').forEach(function (s) { s.classList.toggle('is-active', Number(s.getAttribute('data-step')) === n); });
+    $$('.step').forEach(function (s) {
+      var on = Number(s.getAttribute('data-step')) === n;
+      s.classList.toggle('is-active', on);
+      $('.step-btn', s).setAttribute('aria-pressed', on ? 'true' : 'false');
+    });
   }
 
   if (phone) {
@@ -291,23 +280,11 @@ import { parseDecimal, positive, drawTo, reconstitute } from './calc.js';
     }
   }
 
-  // Wide screens: the statement in the middle of the viewport sets the state.
-  // Phones: the screen is not pinned, so it shows the last state, which carries all three statements
-  // (a logged dose, a lower vial, the low-stock warning); its Log buttons still work.
-  if (phone && 'IntersectionObserver' in window) {
-    var stepObserver = new IntersectionObserver(function (entries) {
-      if (phoneWidth.matches) return;
-      entries.forEach(function (e) {
-        if (e.isIntersecting) setState(Number(e.target.getAttribute('data-step')));
-      });
-    }, { rootMargin: '-45% 0px -45% 0px' });
-    $$('.step').forEach(function (s) { stepObserver.observe(s); });
-
-    var phoneLayout = function () { if (phoneWidth.matches) setState(3); else fitPhone(); };
-    window.addEventListener('resize', fitPhone);
-    if (document.fonts && document.fonts.ready) document.fonts.ready.then(fitPhone);
-    phoneLayout();
-    phoneWidth.addEventListener('change', phoneLayout);
+  // Each statement is a button that puts the Home screen in its state.
+  if (phone) {
+    $$('.step').forEach(function (s) {
+      $('.step-btn', s).addEventListener('click', function () { setState(Number(s.getAttribute('data-step'))); });
+    });
   }
 
   /* ---------- Schedule panel notes line up with the controls they describe ---------- */
@@ -394,7 +371,10 @@ import { parseDecimal, positive, drawTo, reconstitute } from './calc.js';
     }, { threshold: 0 });
     document.addEventListener('focusin', function (e) {
       var hidden = e.target.closest && e.target.closest('[data-reveal]');
-      if (hidden) hidden.classList.add('in');
+      if (!hidden) return;
+      hidden.removeAttribute('data-reveal');
+      hidden.classList.remove('in');
+      hidden.style.removeProperty('--i');
     });
     groups.forEach(function (sel) {
       $$(sel).forEach(function (el, i) {

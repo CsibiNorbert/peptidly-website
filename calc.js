@@ -1,5 +1,5 @@
-// Reconstitution arithmetic for the landing page, ported from the Peptidly app so the site shows exactly
-// what the app shows:
+// Reconstitution arithmetic for the landing page, ported from the Peptidly app so the site computes what
+// the app computes:
 //   parseDecimal  <- helix/lib/parseDecimal.ts
 //   reconstitute  <- helix/services/reconstitution.ts, plus the calculator screen's doses-per-vial
 //   drawTo        <- formatDrawToUnits in helix/lib/dose/doseDisplay.ts

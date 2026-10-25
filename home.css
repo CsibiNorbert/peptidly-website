@@ -98,6 +98,9 @@ a:hover { color: var(--accent-hover); }
 /* On a teal surface the teal ring would vanish: switch it to the dark on-teal ink. */
 .cta :focus-visible,
 .faq details[open] :focus-visible { outline-color: var(--on-accent); }
+.faq details[open] summary:focus-visible { outline-offset: -4px; }
+/* The Home replica draws its frame with an outline; a focus ring must replace it, not lose to it. */
+[data-ui].phone:focus-visible { outline: 2px solid var(--accent); outline-offset: 4px; }
 
 .wrap {
   width: 100%;
@@ -332,7 +335,7 @@ a:hover { color: var(--accent-hover); }
   min-width: 0;
   transition: border-color 160ms ease;
 }
-[data-ui] .field-box.wants { border-color: var(--teal-line); }
+[data-ui] .field-box.wants { border-color: var(--accent); }
 [data-ui] .field-box:focus-within { border-color: var(--accent); }
 [data-ui] .field-icon { width: 18px; height: 18px; flex: none; color: var(--accent); }
 [data-ui] .field-icon.lav { color: var(--lav); }
@@ -501,24 +504,23 @@ h2 {
   font-size: var(--step-s);
 }
 
-/* ---------- The loop (pinned Home screen) ---------- */
+/* ---------- The loop (three statements switch one Home screen) ---------- */
 
 .loop {
   display: grid;
   grid-template-columns: repeat(12, minmax(0, 1fr));
   column-gap: var(--col-gap);
+  align-items: center;
   padding-bottom: var(--section);
 }
 .loop-text { grid-column: 1 / span 5; }
+.steps { display: grid; gap: 8px; margin: 40px 0 0; padding: 0; list-style: none; max-width: 32rem; }
 .step {
-  min-height: 70vh;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  max-width: 30rem;
-  color: var(--muted);
+  position: relative;
+  padding: 20px 24px;
+  border-radius: var(--radius);
+  transition: background-color 200ms ease;
 }
-.step:first-of-type { min-height: 34vh; justify-content: flex-start; padding-top: 56px; }
 .step h3 {
   font-size: var(--step-m);
   font-weight: 700;
@@ -526,20 +528,29 @@ h2 {
   letter-spacing: -0.015em;
   color: var(--muted);
   text-wrap: balance;
-  transition: color 300ms ease;
+  transition: color 200ms ease;
 }
-.step p { margin-top: 12px; font-size: var(--step-s); color: var(--muted); transition: color 300ms ease; }
-.step.is-active h3 { color: var(--ink); }
-.step.is-active p { color: var(--ink); }
+.step p { margin-top: 10px; font-size: var(--step-s); color: var(--muted); transition: color 200ms ease; }
+.step.is-active { background: var(--surface); }
+.step.is-active h3,
+.step.is-active p,
+.step:hover h3 { color: var(--ink); }
+/* The button is the heading's text; its ::after spreads the click target over the whole step. */
+.step-btn {
+  padding: 0;
+  border: 0;
+  background: none;
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+  border-radius: 6px;
+}
+.step-btn::after { content: ""; position: absolute; inset: 0; border-radius: var(--radius); }
 .loop-stage {
   grid-column: 7 / span 6;
-  position: sticky;
-  top: 6vh;
-  height: 88vh;
   display: flex;
-  align-items: center;
   justify-content: flex-end;
-  align-self: start;
 }
 
 /* phone (data-ui) */
@@ -613,9 +624,7 @@ h2 {
 [data-ui] .nudge-title { font-size: 13.5px; font-weight: 600; color: var(--ink); }
 [data-ui] .nudge-sub { margin-top: 2px; font-family: var(--mono); font-size: 11px; color: var(--amber); } /* taste-skill-ignore: app UI inside [data-ui] */
 [data-ui] .nudge-chev { width: 16px; height: 16px; color: var(--amber); flex: none; }
-[data-ui].phone[data-state="3"] .nudge,
-[data-ui].phone.measuring .nudge { max-height: 80px; opacity: 1; margin-bottom: 14px; padding: 12px 14px; }
-[data-ui].phone.measuring .nudge { transition: none; }
+[data-ui].phone[data-state="3"] .nudge { max-height: 80px; opacity: 1; margin-bottom: 14px; padding: 12px 14px; }
 
 [data-ui] .cycle-card {
   position: relative;
@@ -1014,8 +1023,10 @@ h2 {
 .faq summary:hover { color: var(--accent-hover); }
 .faq details[open] summary:hover { color: var(--on-accent); }
 .answer { padding: 0 24px 24px; }
-.answer p { max-width: 52ch; font-size: var(--step-s); line-height: 1.55; color: var(--on-accent); }
-.answer a { color: var(--on-accent); font-weight: 700; }
+.answer p { max-width: 52ch; font-size: var(--step-s); line-height: 1.55; color: var(--ink); }
+.answer a { font-weight: 700; }
+.faq details[open] .answer p,
+.faq details[open] .answer a { color: var(--on-accent); }
 
 /* ---------- CTA field ---------- */
 
@@ -1153,6 +1164,7 @@ h2 {
   [data-ui].instrument { align-items: center; }
   .loop-text { grid-column: 1 / span 6; }
   .loop-stage { grid-column: 7 / span 6; }
+  .steps { margin-top: 32px; }
   [data-ui].phone { width: 340px; }
   .plate { display: flex; flex-direction: column; }
   [data-ui].sheet { order: -1; }
@@ -1201,17 +1213,15 @@ h2 {
   [data-ui] .field-icon { display: none; }
   .stage-note { margin-left: 0; }
 
-  .loop { display: flex; flex-direction: column; }
+  .loop { display: flex; flex-direction: column; align-items: stretch; }
   .loop-text { display: contents; }
   .loop-text h2 { order: 0; }
-  .loop-stage { order: 1; position: static; height: auto; margin: 40px 0 16px; }
-  .loop-text .step { order: 2; }
+  .loop-stage { order: 1; justify-content: center; margin: 32px 0 8px; }
+  .steps { order: 2; margin-top: 16px; }
   [data-ui].phone { width: 100%; max-width: 372px; }
-  .step { min-height: 0; padding-block: 20px; }
-  .step h3, .step p { color: var(--ink); }
+  .step { padding: 18px 20px; }
   [data-ui] .next-icon { width: 40px; height: 40px; }
   [data-ui] .next-log { padding: 0 14px; }
-  .step:first-of-type { min-height: 0; }
 
   .notes { grid-template-columns: 1fr; gap: 20px; }
   [data-ui].sheet { padding: 12px; }
@@ -1244,5 +1254,4 @@ h2 {
   *, *::before, *::after { animation-duration: 1ms !important; animation-iteration-count: 1 !important; transition-duration: 1ms !important; }
   [data-ui] .vial .wave-a, [data-ui] .vial .wave-b, [data-ui] .vial .bubbles circle { animation: none !important; }
   .js [data-reveal] { opacity: 1; transform: none; }
-  [data-ui].phone[data-state="1"] .next-log { animation: none; }
 }

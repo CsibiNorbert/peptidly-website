@@ -161,22 +161,24 @@
       <section class="loop wrap" id="how-it-works" aria-labelledby="loop-title">
         <div class="loop-text">
           <h2 id="loop-title">What you log comes off your stock.</h2>
-          <div class="step" data-step="1">
-            <h3>Log the dose in one tap.</h3>
-            <p>The next dose waits at the top of Home. Tap Log and the time, the amount and, for an injection, the site are recorded.</p>
-          </div>
-          <div class="step" data-step="2">
-            <h3>Then the vial keeps count.</h3>
-            <p>What you drew comes off the open vial, so the level on screen is what is left inside it.</p>
-          </div>
-          <div class="step" data-step="3">
-            <h3>Then it warns you before you run out.</h3>
-            <p>When stock drops below your threshold, Home says what is running low and how much is left.</p>
-          </div>
+          <ol class="steps">
+            <li class="step is-active" data-step="1">
+              <h3><button class="step-btn" type="button" aria-pressed="true" aria-controls="home-demo">Log the dose in one tap.</button></h3>
+              <p>The next dose waits at the top of Home. Tap Log and the time, the amount and, for an injection, the site are recorded.</p>
+            </li>
+            <li class="step" data-step="2">
+              <h3><button class="step-btn" type="button" aria-pressed="false" aria-controls="home-demo">Then the vial keeps count.</button></h3>
+              <p>What you drew comes off the open vial, so the level on screen is what is left inside it.</p>
+            </li>
+            <li class="step" data-step="3">
+              <h3><button class="step-btn" type="button" aria-pressed="false" aria-controls="home-demo">Then it warns you before you run out.</button></h3>
+              <p>When what you hold for a cycle will last two weeks or less, Home names it and says roughly how long it has left.</p>
+            </li>
+          </ol>
         </div>
 
         <div class="loop-stage">
-          <div class="phone" data-ui data-state="1" role="group" tabindex="-1" aria-label="The Peptidly Home screen. The Log buttons work.">
+          <div class="phone" id="home-demo" data-ui data-state="1" role="group" tabindex="-1" aria-label="The Peptidly Home screen. The Log buttons work.">
             <p class="sr-only" id="home-status" aria-live="polite"></p>
             <div class="screen">
               <div class="home-top">
@@ -193,7 +195,7 @@
 
               <div class="nudge" aria-hidden="true">
                 <span class="nudge-dot"></span>
-                <span class="nudge-text"><span class="nudge-title">Running low: AM blend 2 mg</span><span class="nudge-sub">1 vial left</span></span>
+                <span class="nudge-text"><span class="nudge-title">Running low: AM blend 2 mg</span><span class="nudge-sub">~2 wks left</span></span>
                 <svg class="nudge-chev" viewBox="0 0 24 24"><path d="M9 6l6 6-6 6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
               </div>
 
@@ -226,7 +228,7 @@
               </div>
 
               <div class="today-list" role="list">
-              <div class="dose-row" data-row="1" role="listitem">
+              <div class="dose-row" role="listitem">
                 <svg class="mini-vial" viewBox="0 0 22 54" aria-hidden="true"><rect x="6.6" y="0" width="8.8" height="4" rx="1" fill="#2a3a54"/><rect x="2" y="6" width="18" height="46" rx="4" fill="#0c1725" stroke="rgba(255,255,255,.1)" stroke-width=".75"/><rect class="mini-fill" x="3" y="27" width="16" height="25" rx="3"/><rect x="4" y="10" width="2" height="34" rx="1" fill="rgba(255,255,255,.08)"/></svg>
                 <div class="dose-text">
                   <p class="dose-name">AM blend <svg class="tick" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg></p>
@@ -238,7 +240,7 @@
                 <span class="row-done" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7.5" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
               </div>
 
-              <div class="dose-row" data-row="2" role="listitem">
+              <div class="dose-row" role="listitem">
                 <svg class="mini-vial lav" viewBox="0 0 22 54" aria-hidden="true"><rect x="6.6" y="0" width="8.8" height="4" rx="1" fill="#2a3a54"/><rect x="2" y="6" width="18" height="46" rx="4" fill="#0c1725" stroke="rgba(255,255,255,.1)" stroke-width=".75"/><rect class="mini-fill" x="3" y="36" width="16" height="16" rx="3"/><rect x="4" y="10" width="2" height="34" rx="1" fill="rgba(255,255,255,.08)"/></svg>
                 <div class="dose-text">
                   <p class="dose-name">PM blend <svg class="tick" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg></p>

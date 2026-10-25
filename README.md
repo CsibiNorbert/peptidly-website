@@ -58,8 +58,8 @@ GitHub Pages picks up the new commit within a minute.
 `index.html` is hand-written. Edit it directly if the landing copy changes. Its styles are in
 `home.css` and its script in `home.js`; the legal pages keep `style.css`. No preprocessor, no build.
 
-The interface pieces on the landing page (the calculator, the Home screen, the schedule panel, the
-first-run screen) are drawn in HTML from the app's current screens and carry `data-ui`. When the app's
+The interface pieces on the landing page (the calculator, the Home screen, the schedule panel, Home
+before the first cycle) are drawn in HTML from the app's current screens and carry `data-ui`. When the app's
 look changes, update them to match; they are not screenshots and will not update themselves.
 
 ## The calculator
@@ -74,8 +74,9 @@ node --experimental-strip-types scripts/check-calculator.mjs
 
 It compares several thousand inputs, figure by figure, against the app's own functions in the sibling
 Peptides repo and exits 1 on any difference. Where a figure cannot be computed from what was entered,
-the page shows an em dash; the app's screen shows zeros there, and that is the one deliberate
-difference. The page never fills in a dose: the dose field starts empty.
+the page shows an em dash, and it shows the concentration before a dose is entered. The app's
+calculator screen shows zeros in those states instead. The page never fills in a dose: the dose field
+starts empty.
 
 ## Local preview
 

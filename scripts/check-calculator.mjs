@@ -7,9 +7,9 @@
 // Exits 1 on any difference.
 //
 // Figure by figure: where a figure's inputs are valid, the site must print what the app's own
-// functions compute; where they are not, the site must print nothing (an em dash). The app's screen
-// prints something else there (zeros, or a negative count for a negative vial size): that is the one
-// deliberate difference.
+// functions compute; where they are not, the site must print nothing (an em dash). The app's calculator
+// screen prints something else in those states: zeros, a concentration of 0.00 while the dose is empty,
+// or a negative count for a negative vial size. Those display differences are deliberate.
 
 import { readFileSync } from 'node:fs';
 import { dirname, resolve } from 'node:path';
@@ -66,7 +66,7 @@ function siteFigures(vs, ws, ds) {
   };
 }
 
-const vials = ['0.5', '1', '2', '2.5', '5', '10', '15', '20', '30', '50', '2,5', '1.000,5', ' 10 '];
+const vials = ['0.5', '1', '2', '2.5', '5', '10', '15', '20', '30', '50', '2,5', '1.000,5', '1,000.5', ' 10 '];
 const waters = ['0.5', '1', '1.5', '2', '2.5', '3', '5', '0,25'];
 const doses = ['25', '50', '100', '125', '250', '300', '333', '500', '617', '750', '1000', '2000', '2500', '5000', '0,5'];
 const invalid = ['', '0', '-5', 'abc', '1e999'];
