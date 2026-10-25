@@ -30,11 +30,16 @@ export function drawTo(units) {
   return tenths.endsWith('.0') ? tenths.slice(0, -2) : tenths;
 }
 
-// Missing or non-positive inputs give null where the app shows zeros: the site prints an em dash.
+// Each figure needs only its own inputs: concentration needs the vial and the water, doses per vial
+// the vial and the dose, the draw all three. A figure whose inputs are missing, not positive or not
+// finite is null, and the page prints an em dash. (The app's screen shows 0 for the draw and the
+// concentration whenever any input is missing; wherever a figure's inputs are valid and the result is
+// finite, it matches the app.)
 export function reconstitute(vialMg, waterMl, doseMcg) {
-  const conc = positive(vialMg) && positive(waterMl) ? vialMg / waterMl : NaN;
-  if (!positive(conc)) return { conc: null, volume: null, units: null, dosesPerVial: null };
-  if (!positive(doseMcg)) return { conc, volume: null, units: null, dosesPerVial: null };
+  const ratio = positive(vialMg) && positive(waterMl) ? vialMg / waterMl : NaN;
+  const conc = positive(ratio) ? ratio : null;
+  const dosesPerVial = positive(vialMg) && positive(doseMcg) ? Math.floor((vialMg * 1000) / doseMcg) : null;
+  if (conc === null || !positive(doseMcg)) return { conc, dosesPerVial, volume: null, units: null };
   const volume = doseMcg / 1000 / conc;
-  return { conc, volume, units: volume * 100, dosesPerVial: Math.floor((vialMg * 1000) / doseMcg) };
+  return { conc, dosesPerVial, volume, units: volume * 100 };
 }

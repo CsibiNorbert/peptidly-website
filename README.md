@@ -64,16 +64,18 @@ look changes, update them to match; they are not screenshots and will not update
 
 ## The calculator
 
-The calculator on the landing page must show exactly what the app shows for the same numbers. Its
-arithmetic lives in `calc.js`. After any change to it, or to the app's reconstitution code, run:
+The calculator on the landing page must compute what the app computes. Its arithmetic lives in
+`calc.js`. After any change to it, or to the app's reconstitution code, run:
 
 ```bash
 cd C:\Users\norbe\source\repos\peptidly-website
 node --experimental-strip-types scripts/check-calculator.mjs
 ```
 
-It compares several thousand inputs against the app's own functions in the sibling Peptides repo and
-exits 1 on any difference. The page never fills in a dose: the dose field starts empty.
+It compares several thousand inputs, figure by figure, against the app's own functions in the sibling
+Peptides repo and exits 1 on any difference. Where a figure cannot be computed from what was entered,
+the page shows an em dash; the app's screen shows zeros there, and that is the one deliberate
+difference. The page never fills in a dose: the dose field starts empty.
 
 ## Local preview
 

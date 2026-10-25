@@ -5,14 +5,14 @@ import { parseDecimal, positive, drawTo, reconstitute } from './calc.js';
 (function () {
   'use strict';
 
+  // Set here, not inline: if this module never runs, nothing waits on it (hidden content, endless motion).
+  document.documentElement.classList.add('js');
+
   var reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
   var phoneWidth = window.matchMedia('(max-width: 699px)');
   var desktopWidth = window.matchMedia('(min-width: 1100px)');
   var $ = function (sel, root) { return (root || document).querySelector(sel); };
   var $$ = function (sel, root) { return Array.prototype.slice.call((root || document).querySelectorAll(sel)); };
-
-  // The vial's colour bands, from the design reference vial.jsx.
-  function band(pct) { return pct > 50 ? 'teal' : pct > 20 ? 'lav' : 'coral'; }
 
   /* ---------- The vial (hero) ---------- */
 
@@ -64,9 +64,24 @@ import { parseDecimal, positive, drawTo, reconstitute } from './calc.js';
   var lastDose = '';
   var rippleTimer = 0;
 
+  var status = $('#calc-status');
+  var statusTimer = 0;
+
   function trim(n) { return String(Math.round(n * 1000) / 1000); }
 
-  function calculate() {
+  function announce(r) {
+    if (!status) return;
+    clearTimeout(statusTimer);
+    statusTimer = setTimeout(function () {
+      status.textContent = r.units !== null
+        ? 'Draw to ' + drawTo(r.units) + ' units, ' + r.volume.toFixed(3) + ' ml, on a 1 ml insulin syringe.'
+        : r.conc !== null
+          ? 'Concentration ' + r.conc.toFixed(2) + ' mg per ml. Enter a dose to see the draw.'
+          : 'Enter the vial size and the water added.';
+    }, 700);
+  }
+
+  function calculate(e) {
     if (!inVial) return;
     var v = parseDecimal(inVial.value);
     var w = parseDecimal(inWater.value);
@@ -79,6 +94,7 @@ import { parseDecimal, positive, drawTo, reconstitute } from './calc.js';
     wake();
     var r = reconstitute(v, w, d);
     out.conc.textContent = r.conc === null ? '—' : r.conc.toFixed(2);
+    out.doses.textContent = r.dosesPerVial === null ? '—' : String(r.dosesPerVial);
 
     if (r.units !== null) {
       var units = r.units;
@@ -89,7 +105,6 @@ import { parseDecimal, positive, drawTo, reconstitute } from './calc.js';
       out.pct.textContent = drawTo(Math.min(100, units)) + '%';
       out.fill.style.width = Math.min(100, units) + '%';
       out.fill.classList.remove('empty');
-      out.doses.textContent = String(r.dosesPerVial);
       ticks.forEach(function (t) {
         var p = Number(t.getAttribute('data-tick'));
         t.classList.toggle('on', units >= p && units < p + 12.5);
@@ -101,9 +116,10 @@ import { parseDecimal, positive, drawTo, reconstitute } from './calc.js';
       out.pct.textContent = '—';
       out.fill.style.width = '0%';
       out.fill.classList.add('empty');
-      out.doses.textContent = '—';
       ticks.forEach(function (t) { t.classList.remove('on'); });
     }
+
+    if (e) announce(r);
 
     if (inDose.value !== lastDose) {
       lastDose = inDose.value;
@@ -113,7 +129,10 @@ import { parseDecimal, positive, drawTo, reconstitute } from './calc.js';
   }
 
   if (inVial) {
-    [inVial, inWater, inDose].forEach(function (el) { el.addEventListener('input', calculate); });
+    [inVial, inWater, inDose].forEach(function (el) {
+      el.removeAttribute('readonly');
+      el.addEventListener('input', calculate);
+    });
     calculate();
     // The app fills a vial in on mount; start empty, then fill on the next frames.
     if (liquid && !reduceMotion.matches) {
@@ -137,8 +156,9 @@ import { parseDecimal, positive, drawTo, reconstitute } from './calc.js';
 
   (function datesFollowToday() {
     var today = new Date();
-    var start = addDays(today, -19); // today is day 20
-    var end = addDays(start, 57);    // a 58-day cycle
+    // Today is day 20 of a 58-day cycle: the card's static 'DAY 20', '38 days remaining' and 34 % say so.
+    var start = addDays(today, -19);
+    var end = addDays(start, 57);
     $$('[data-today]').forEach(function (el) { el.textContent = shortDate(today); });
     $$('[data-cycle-start]').forEach(function (el) { el.textContent = shortDate(start); });
     $$('[data-cycle-end]').forEach(function (el) { el.textContent = shortDate(end); });
@@ -153,8 +173,8 @@ import { parseDecimal, positive, drawTo, reconstitute } from './calc.js';
   var rows = phone ? $$('.dose-row', phone) : [];
   // Numbers that add up: 250 mcg from a 2 mg vial is 12.5 % of it; 500 mcg from a 5 mg vial is 10 %.
   var DATA = [
-    { title: 'AM blend · 250 mcg', when: 'in 12m · 08:00', before: 62.5, after: 50 },
-    { title: 'PM blend · 500 mcg', when: 'in 12h 12m · 20:00', before: 40, after: 30 }
+    { name: 'AM blend', title: 'AM blend · 250 mcg', when: 'in 12m · 08:00', before: 62.5, after: 50 },
+    { name: 'PM blend', title: 'PM blend · 500 mcg', when: 'in 12h 12m · 20:00', before: 40, after: 30 }
   ];
   var resetTimer = 0;
 
@@ -164,7 +184,8 @@ import { parseDecimal, positive, drawTo, reconstitute } from './calc.js';
     var h = (pct / 100) * 40; // VialMini: fill = pct of (height - 14)
     rect.setAttribute('y', String(52 - h));
     rect.setAttribute('height', String(h));
-    svg.classList.toggle('lav', band(pct) === 'lav');
+    // vial.jsx bands: teal above 50 %, lavender above 20 %. No row here goes below 30 %.
+    svg.classList.toggle('lav', pct <= 50);
   }
 
   function render(taken) {
@@ -187,32 +208,87 @@ import { parseDecimal, positive, drawTo, reconstitute } from './calc.js';
 
   var takenState = [false, false];
 
-  function logNext() {
-    var i = takenState.indexOf(false);
-    if (i === -1) return;
+  var homeStatus = phone && $('#home-status', phone);
+  function say(text) { if (homeStatus) homeStatus.textContent = text; }
+
+  function isShown(el) { return el.offsetParent !== null && getComputedStyle(el).visibility !== 'hidden'; }
+
+  // A pressed Log button hides itself; keep focus inside the screen instead of losing it to the page.
+  function keepFocus() {
+    var active = document.activeElement;
+    if (!phone || !phone.contains(active) || active === phone || isShown(active)) return;
+    var next = $$('[data-log]', phone).filter(isShown)[0];
+    (next || phone).focus();
+  }
+
+  function logRow(i) {
+    if (i < 0 || takenState[i]) return;
     takenState[i] = true;
     render(takenState);
+    var count = takenState.filter(Boolean).length;
+    say(DATA[i].name + ' logged. ' + count + ' of ' + DATA.length + ' doses taken today.');
+    keepFocus();
     var row = rows[i];
     row.classList.add('just');
     setTimeout(function () { row.classList.remove('just'); }, 900);
     if (takenState.indexOf(false) === -1) {
       clearTimeout(resetTimer);
-      resetTimer = setTimeout(function () { takenState = [false, false]; render(takenState); }, 3200);
+      resetTimer = setTimeout(function () {
+        takenState = [Number(phone.getAttribute('data-state')) >= 2, false];
+        render(takenState);
+        say('The demo has reset.');
+        keepFocus();
+      }, 3200);
     }
+  }
+
+  // Measured with the low-stock banner open, so the scale does not change between states.
+  function fitPhone() {
+    if (!phone) return;
+    if (phoneWidth.matches) { phone.style.zoom = ''; return; }
+    phone.style.zoom = '';
+    phone.classList.add('measuring');
+    var natural = phone.offsetHeight;
+    phone.classList.remove('measuring');
+    var room = window.innerHeight * 0.86;
+    phone.style.zoom = natural > room ? String(Math.max(0.6, room / natural)) : '';
+  }
+
+  function pulseLog() {
+    var b = $('.next-log', phone);
+    b.classList.remove('pulse');
+    void b.offsetWidth;
+    b.classList.add('pulse');
   }
 
   function setState(n) {
     if (!phone) return;
+    var was = phone.getAttribute('data-state');
     phone.setAttribute('data-state', String(n));
+    if (n === 1 && was !== '1') pulseLog();
     clearTimeout(resetTimer);
     takenState = [n >= 2, false];
     render(takenState);
+    $('.nudge', phone).setAttribute('aria-hidden', n === 3 ? 'false' : 'true');
+    keepFocus();
+    fitPhone();
     $$('.step').forEach(function (s) { s.classList.toggle('is-active', Number(s.getAttribute('data-step')) === n); });
   }
 
   if (phone) {
-    $$('[data-log]', phone).forEach(function (b) { b.addEventListener('click', logNext); });
+    $$('[data-log]', phone).forEach(function (b) {
+      b.addEventListener('click', function () {
+        var row = b.closest('.dose-row');
+        logRow(row ? rows.indexOf(row) : takenState.indexOf(false));
+      });
+    });
     setState(1);
+    // The Log pulse runs when the screen is first seen, not at load while it is still below the fold.
+    if ('IntersectionObserver' in window) {
+      new IntersectionObserver(function (entries, obs) {
+        if (entries[0].isIntersecting) { pulseLog(); obs.disconnect(); }
+      }, { threshold: 0.5 }).observe(phone);
+    }
   }
 
   // Wide screens: the statement in the middle of the viewport sets the state.
@@ -227,7 +303,9 @@ import { parseDecimal, positive, drawTo, reconstitute } from './calc.js';
     }, { rootMargin: '-45% 0px -45% 0px' });
     $$('.step').forEach(function (s) { stepObserver.observe(s); });
 
-    var phoneLayout = function () { if (phoneWidth.matches) setState(3); };
+    var phoneLayout = function () { if (phoneWidth.matches) setState(3); else fitPhone(); };
+    window.addEventListener('resize', fitPhone);
+    if (document.fonts && document.fonts.ready) document.fonts.ready.then(fitPhone);
     phoneLayout();
     phoneWidth.addEventListener('change', phoneLayout);
   }
@@ -237,23 +315,41 @@ import { parseDecimal, positive, drawTo, reconstitute } from './calc.js';
   var plate = $('.plate');
   var notes = plate ? $$('.note', plate) : [];
 
+  // Offsets ignore transforms, so the sheet's entrance (it rises 24px) cannot misplace the notes.
+  function topIn(el, ancestor) {
+    var y = 0;
+    while (el && el !== ancestor) { y += el.offsetTop; el = el.offsetParent; }
+    return el === ancestor ? y : NaN;
+  }
+
+  var notesPlaced = false;
   function alignNotes() {
     if (!plate) return;
     if (!desktopWidth.matches) {
-      notes.forEach(function (n) { n.style.top = ''; });
+      if (notesPlaced) notes.forEach(function (n) { n.style.top = ''; });
+      notesPlaced = false;
       return;
     }
-    var plateTop = plate.getBoundingClientRect().top;
     ['.notes-left', '.notes-right'].forEach(function (side) {
+      var list = $$('.note', $(side, plate));
+      var wanted = list.map(function (n) { return topIn(document.getElementById(n.getAttribute('data-for')), plate); });
+      var heights = list.map(function (n) { return n.offsetHeight; });
       var floor = 0;
-      $$('.note', $(side, plate)).forEach(function (n) {
-        var target = document.getElementById(n.getAttribute('data-for'));
-        if (!target) return;
-        var top = Math.max(target.getBoundingClientRect().top - plateTop - 4, floor);
+      list.forEach(function (n, i) {
+        if (!Number.isFinite(wanted[i])) return;
+        var top = Math.max(wanted[i] - 4, floor);
         n.style.top = top + 'px';
-        floor = top + n.offsetHeight + 16;
+        floor = top + heights[i] + 16;
       });
     });
+    notesPlaced = true;
+  }
+
+  var alignQueued = false;
+  function queueAlign() {
+    if (alignQueued) return;
+    alignQueued = true;
+    requestAnimationFrame(function () { alignQueued = false; alignNotes(); });
   }
 
   notes.forEach(function (n) {
@@ -266,7 +362,7 @@ import { parseDecimal, positive, drawTo, reconstitute } from './calc.js';
   });
 
   alignNotes();
-  window.addEventListener('resize', alignNotes);
+  window.addEventListener('resize', queueAlign);
   if (document.fonts && document.fonts.ready) document.fonts.ready.then(alignNotes);
 
   /* ---------- Entrances: each section's parts rise in turn, once ---------- */
@@ -283,9 +379,23 @@ import { parseDecimal, positive, drawTo, reconstitute } from './calc.js';
     ];
     var revealer = new IntersectionObserver(function (entries) {
       entries.forEach(function (e) {
-        if (e.isIntersecting) { e.target.classList.add('in'); revealer.unobserve(e.target); }
+        if (!e.isIntersecting) return;
+        var el = e.target;
+        el.classList.add('in');
+        revealer.unobserve(el);
+        // Once it has arrived, drop the entrance styles so the element's own hover, press and colour
+        // transitions apply again (the entrance's transform and transition would override them).
+        setTimeout(function () {
+          el.removeAttribute('data-reveal');
+          el.classList.remove('in');
+          el.style.removeProperty('--i');
+        }, 1300);
       });
-    }, { rootMargin: '0px 0px -8% 0px', threshold: 0.12 });
+    }, { threshold: 0 });
+    document.addEventListener('focusin', function (e) {
+      var hidden = e.target.closest && e.target.closest('[data-reveal]');
+      if (hidden) hidden.classList.add('in');
+    });
     groups.forEach(function (sel) {
       $$(sel).forEach(function (el, i) {
         el.setAttribute('data-reveal', '');

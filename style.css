@@ -3,7 +3,6 @@
 :root {
   --midnight: #0D1B2A;
   --midnight-light: #1B2D42;
-  --midnight-lighter: #283B5A;
   --teal: #00B4D8;
   --teal-bright: #48C9E8;
   --lavender: #7B8CDE;
@@ -105,76 +104,6 @@ main p.last-updated {
   margin: 0 0 32px;
 }
 
-main p.tagline {
-  color: var(--lavender);
-  font-size: 18px;
-  font-weight: 500;
-  margin: 0 0 24px;
-}
-
-main p.description {
-  font-size: 16px;
-  margin: 0 0 32px;
-}
-
-.download {
-  margin: 0 0 8px;
-}
-
-.download .play-badge {
-  display: inline-block;
-  margin-left: -10px; /* offset the badge artwork's built-in clear space */
-}
-
-.download .play-badge:hover {
-  opacity: 0.9;
-  text-decoration: none;
-}
-
-.download .play-badge img {
-  display: block;
-  height: 72px;
-  width: auto;
-}
-
-.download .download-note {
-  color: var(--lavender);
-  font-size: 13px;
-  margin: 6px 0 0;
-}
-
-.legal-list,
-.contact {
-  margin: 32px 0;
-  padding: 20px 24px;
-  background: var(--midnight-light);
-  border-radius: 12px;
-  border-left: 3px solid var(--teal);
-}
-
-.legal-list h2 {
-  margin-top: 0;
-  padding-left: 0;
-  border-left: none;
-}
-
-.legal-list a {
-  display: block;
-  padding: 10px 0;
-  font-size: 16px;
-  font-weight: 500;
-  border-bottom: 1px solid var(--midnight-lighter);
-}
-
-.legal-list a:last-child {
-  border-bottom: none;
-}
-
-.contact p {
-  margin: 0;
-  font-size: 14px;
-}
-
 footer {
   max-width: 720px;
   margin: 0 auto;
@@ -193,13 +122,6 @@ footer p.copyright {
   color: var(--lavender);
   margin: 12px 0 0;
   opacity: 0.7;
-}
-
-footer p.trademark {
-  color: var(--lavender);
-  font-size: 11px;
-  margin: 6px 0 0;
-  opacity: 0.5;
 }
 
 @media (max-width: 720px) {
