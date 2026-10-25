@@ -139,7 +139,7 @@ If this repo doesn't have a remote yet, here's the full setup:
 ## Notes
 
 - No analytics, no cookies, and nothing is loaded from another domain: the fonts are self-hosted.
-  The landing page runs one small script with no dependencies (`home.js` and `calc.js`), and the
+  The landing page runs a small script with no dependencies (`home.js` and `calc.js`), and the
   unsubscribe page calls the Supabase edge function. The legal pages use the system font stack.
   The landing page is about 140 KB on first load, most of it the two font files.
 - The text in the legal documents is **not legal advice**. The drafts were

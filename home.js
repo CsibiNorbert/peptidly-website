@@ -31,13 +31,13 @@ import { parseDecimal, positive, drawTo, reconstitute } from './calc.js';
     $('.bubbles', vial).style.display = p > 15 ? '' : 'none';
   }
 
-  // Motion that starts on its own stops on its own (WCAG 2.2.2): the liquid settles 12 s after the last change.
+  // Motion that starts on its own stops within five seconds (WCAG 2.2.2): the liquid settles 5 s after the last change.
   var restTimer = 0;
   function wake() {
     if (!vial) return;
     vial.classList.remove('is-resting');
     clearTimeout(restTimer);
-    restTimer = setTimeout(function () { vial.classList.add('is-resting'); }, 12000);
+    restTimer = setTimeout(function () { vial.classList.add('is-resting'); }, 5000);
   }
 
   function rippleVial() {
@@ -216,10 +216,8 @@ import { parseDecimal, positive, drawTo, reconstitute } from './calc.js';
   }
 
   // Wide screens: the statement in the middle of the viewport sets the state.
-  // Phones: the screen is not pinned, so the three states crossfade on a slow timer while it is in view.
-  var autoTimer = 0;
-  var phoneVisible = false;
-
+  // Phones: the screen is not pinned, so it shows the last state, which carries all three statements
+  // (a logged dose, a lower vial, the low-stock warning); its Log buttons still work.
   if (phone && 'IntersectionObserver' in window) {
     var stepObserver = new IntersectionObserver(function (entries) {
       if (phoneWidth.matches) return;
@@ -229,22 +227,9 @@ import { parseDecimal, positive, drawTo, reconstitute } from './calc.js';
     }, { rootMargin: '-45% 0px -45% 0px' });
     $$('.step').forEach(function (s) { stepObserver.observe(s); });
 
-    var cycleStates = function () {
-      clearInterval(autoTimer);
-      if (!phoneWidth.matches || !phoneVisible || reduceMotion.matches) return;
-      var n = Number(phone.getAttribute('data-state')) || 1;
-      var turns = 0;
-      autoTimer = setInterval(function () {
-        n = n % 3 + 1;
-        setState(n);
-        if (++turns >= 6) clearInterval(autoTimer); // two passes, then it holds
-      }, 4200);
-    };
-    new IntersectionObserver(function (entries) {
-      phoneVisible = entries[0].isIntersecting;
-      cycleStates();
-    }, { threshold: 0.4 }).observe(phone);
-    phoneWidth.addEventListener('change', cycleStates);
+    var phoneLayout = function () { if (phoneWidth.matches) setState(3); };
+    phoneLayout();
+    phoneWidth.addEventListener('change', phoneLayout);
   }
 
   /* ---------- Schedule panel notes line up with the controls they describe ---------- */
