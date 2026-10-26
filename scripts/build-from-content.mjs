@@ -7,7 +7,7 @@
 // Source of truth lives in the app, not here. Run this script every time the
 // in-app legal text changes:
 //
-//   cd C:\Users\norbe\source\repos\peptidly-website
+//   cd path\to\peptidly-website
 //   node scripts/build-from-content.mjs
 //
 // Then commit and push the website repo to deploy via GitHub Pages.

@@ -1,5 +1,5 @@
 /* The site-rotation demo's rules, kept apart from the page so scripts/check-sites.mjs can run them against
-   the app's own (helix/lib/dose-log/rotation.ts and bodyGeometry.ts, strict rule, default settings). */
+   the app's own rotation and body-map code (strict rule, default settings). */
 
 // The app's default rest window: three days.
 export const REST_HOURS = 72;

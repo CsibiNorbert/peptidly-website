@@ -42,11 +42,11 @@ To update:
 
 ```bash
 # 1. Edit the constants in the app repo
-cd C:\Users\norbe\source\repos\Peptides\helix
+cd path\to\Peptides\helix
 # ... edit legal/content.ts ...
 
 # 2. Re-run the build script in the website repo
-cd C:\Users\norbe\source\repos\peptidly-website
+cd path\to\peptidly-website
 node scripts/build-from-content.mjs
 
 # 3. Commit and push the website repo
@@ -72,7 +72,7 @@ The calculator on the landing page must compute what the app computes. Its arith
 `calc.js`. After any change to it, or to the app's reconstitution code, run:
 
 ```bash
-cd C:\Users\norbe\source\repos\peptidly-website
+cd path\to\peptidly-website
 node --experimental-strip-types scripts/check-calculator.mjs
 ```
 
@@ -117,7 +117,7 @@ warning differs from the app's. Both need the sibling Peptides repo.
 The site is pure static HTML, so any local server works:
 
 ```bash
-cd C:\Users\norbe\source\repos\peptidly-website
+cd path\to\peptidly-website
 python -m http.server 8000
 # open http://localhost:8000
 ```
@@ -137,7 +137,7 @@ If this repo doesn't have a remote yet, here's the full setup:
 
 2. **Push the local files:**
    ```bash
-   cd C:\Users\norbe\source\repos\peptidly-website
+   cd path\to\peptidly-website
    git init
    git add .
    git commit -m "initial commit"
@@ -179,6 +179,3 @@ If this repo doesn't have a remote yet, here's the full setup:
   The landing page runs a small script with no dependencies (`home.js` and `calc.js`), and the
   unsubscribe page calls the Supabase edge function. The legal pages use the system font stack.
   The landing page is about 140 KB on first load, most of it the two font files.
-- The text in the legal documents is **not legal advice**. The drafts were
-  written based on what the Peptidly app actually does, but a real lawyer
-  should review them before any major distribution event.

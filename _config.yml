@@ -1,0 +1,5 @@
+# GitHub Pages builds this site with Jekyll, which publishes every file it is not told to skip.
+# Only the pages and their assets belong on peptidly.co.uk; the docs and dev scripts stay in the repo.
+exclude:
+  - README.md
+  - scripts
