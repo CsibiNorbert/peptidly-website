@@ -1,53 +1,450 @@
 <!doctype html>
-<html lang="en">
+<html lang="en-GB">
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Peptidly — Personal Peptide Cycle Tracker</title>
-    <meta name="description" content="Peptidly is a personal peptide cycle tracker for Android. Plan cycles, log doses, track vial inventory, and forecast your supply.">
+    <title>Peptidly — Peptide cycle tracker for Android</title>
+    <meta name="description" content="Peptidly is a personal peptide cycle tracker for Android. Plan cycles, log doses in one tap, get exact syringe units from your vial and BAC water, and see when your supply runs low.">
+    <link rel="canonical" href="https://peptidly.co.uk/">
+    <meta name="theme-color" content="#0D1B2A">
+    <meta property="og:type" content="website">
+    <meta property="og:site_name" content="Peptidly">
+    <meta property="og:title" content="Peptidly — Peptide cycle tracker for Android">
+    <meta property="og:description" content="Plan cycles, log doses in one tap, get exact syringe units from your vial and BAC water, and see when your supply runs low.">
+    <meta property="og:url" content="https://peptidly.co.uk/">
+    <meta property="og:image" content="https://peptidly.co.uk/assets/og-image.jpg">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+    <meta property="og:image:alt" content="Peptidly: peptide cycles, finally organised.">
+    <meta name="twitter:card" content="summary_large_image">
     <link rel="icon" type="image/png" href="/assets/favicon.png">
-    <link rel="stylesheet" href="style.css">
+    <link rel="preload" href="/assets/fonts/inter-latin-wght.woff2" as="font" type="font/woff2" crossorigin>
+    <link rel="stylesheet" href="/home.css">
+    <script type="module" src="/home.js"></script>
   </head>
   <body>
-    <header>
-      <a href="/" class="brand">
-        <img src="/assets/peptidly-mark-80.png" alt="" width="30" height="30">
-        <span>Peptidly</span>
+    <a class="skip" href="#main">Skip to content</a>
+
+    <header class="top wrap">
+      <a class="brand" href="/" aria-label="Peptidly, home">
+        <img src="/assets/peptidly-mark-80.png" alt="" width="32" height="32">
+        <span class="wordmark" aria-hidden="true">PEPTIDLY</span>
       </a>
+      <nav class="top-nav" aria-label="Sections">
+        <a href="#calculator">Calculator</a>
+        <a href="#how-it-works">How it works</a>
+        <a href="#privacy">Privacy</a>
+        <a href="#faq">FAQ</a>
+      </nav>
+      <a class="btn btn-small" href="https://play.google.com/store/apps/details?id=com.peptidly.app&amp;referrer=utm_source%3Dpeptidly.co.uk%26utm_medium%3Dweb">Get the app</a>
     </header>
-    <main>
-      <h1>Peptidly</h1>
-      <p class="tagline">A personal peptide cycle tracker for Android.</p>
-      <p class="description">
-        Plan your cycles, log every dose with one tap, track your vial inventory automatically,
-        and see when your supply will run out — all in one place. No medical advice, just
-        record-keeping for people who already know what they're doing.
-      </p>
 
-      <section class="download">
-        <a class="play-badge" href="https://play.google.com/store/apps/details?id=com.peptidly.app&amp;referrer=utm_source%3Dpeptidly.co.uk%26utm_medium%3Dweb">
-          <img src="/assets/google-play-badge.png" alt="Get it on Google Play" height="72">
-        </a>
-        <p class="download-note">Free to start · No ads · Offline-first</p>
+    <main id="main">
+      <!-- Hero: the claim, the action, and the app's own calculator working beside its vial. -->
+      <section class="hero wrap" id="calculator" aria-labelledby="hero-title">
+        <div class="hero-copy">
+          <h1 id="hero-title">Peptide cycles, <span class="payoff">finally organised.</span></h1>
+          <p class="lead">Plan each cycle, log a dose in one tap, and let Peptidly do the reconstitution maths and count down your vials.</p>
+          <div class="actions">
+            <a class="play" href="https://play.google.com/store/apps/details?id=com.peptidly.app&amp;referrer=utm_source%3Dpeptidly.co.uk%26utm_medium%3Dweb">
+              <img src="/assets/google-play-badge.png" alt="Get it on Google Play" width="646" height="250">
+            </a>
+            <p class="meta">Free to start · No ads · Android 7.0 and newer</p>
+          </div>
+        </div>
+
+        <div class="hero-stage">
+          <div class="instrument" data-ui role="group" aria-label="The Peptidly reconstitution calculator. Change the numbers to try it.">
+            <div class="vial-wrap">
+              <svg class="vial" viewBox="0 0 120 300" width="120" height="300" aria-hidden="true" focusable="false">
+                <defs>
+                  <clipPath id="vial-body">
+                    <path d="M2 52Q2 42 12 42H108Q118 42 118 52V282Q118 292 108 292H12Q2 292 2 282Z"/>
+                  </clipPath>
+                  <linearGradient id="vial-liquid" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0" stop-color="currentColor" stop-opacity=".9"/>
+                    <stop offset="1" stop-color="currentColor" stop-opacity=".55"/>
+                  </linearGradient>
+                  <radialGradient id="vial-glow" cx=".5" cy=".55" r=".5">
+                    <stop offset="0" stop-color="currentColor" stop-opacity=".26"/>
+                    <stop offset="1" stop-color="currentColor" stop-opacity="0"/>
+                  </radialGradient>
+                </defs>
+                <ellipse class="vial-glow" cx="60" cy="184" rx="88" ry="136" fill="url(#vial-glow)"/>
+                <rect x="35.4" y="0" width="49.2" height="10" rx="2" fill="#2a3a54"/>
+                <rect x="38.4" y="8" width="43.2" height="18" fill="#1e2d44" stroke="rgba(255,255,255,.06)" stroke-width=".5"/>
+                <path d="M38.4 24L12 42H108L81.6 24Z" fill="#1e2d44" stroke="rgba(255,255,255,.06)" stroke-width=".5"/>
+                <path d="M2 52Q2 42 12 42H108Q118 42 118 52V286Q118 296 108 296H12Q2 296 2 286Z" fill="#0c1725" stroke="rgba(255,255,255,.1)"/>
+                <g clip-path="url(#vial-body)">
+                  <g class="liquid">
+                    <path class="wave" d="M4 1.78L7 2.96L10 3.91L13 4.56L16 4.89L19 4.91L22 4.66L25 4.21L28 3.64L31 3.04L34 2.49L37 2.05L40 1.74L43 1.56L46 1.49L49 1.47L52 1.43L55 1.3L58 1.01L61 0.53L64 -0.16L67 -1.03L70 -2.03L73 -3.09L76 -4.11L79 -4.97L82 -5.61L85 -5.93L88 -5.89L91 -5.5L94 -4.78L97 -3.8L100 -2.65L103 -1.43L106 -0.24L109 0.81L112 1.67L115 2.28L116 270H4Z" fill="url(#vial-liquid)"/>
+                    <path class="wave" d="M4 4.36L7 3.35L10 2.26L13 1.2L16 0.24L19 -0.54L22 -1.11L25 -1.47L28 -1.65L31 -1.71L34 -1.71L37 -1.73L40 -1.83L43 -2.05L46 -2.4L49 -2.87L52 -3.41L55 -3.96L58 -4.43L61 -4.72L64 -4.78L67 -4.54L70 -3.98L73 -3.12L76 -2L79 -0.71L82 0.65L85 1.97L88 3.15L91 4.09L94 4.73L97 5.05L100 5.04L103 4.76L106 4.28L109 3.67L112 3.02L115 2.43L116 270H4Z" fill="currentColor" opacity=".35"/>
+                    <g class="bubbles"><circle cx="10" cy="12" r="1.71"/><circle cx="33" cy="52" r="2.57"/><circle cx="56" cy="92" r="1.71"/></g>
+                    <g class="ripple"><circle class="ring ring-a" cx="60" cy="2" r="1"/><circle class="ring ring-b" cx="60" cy="2" r="1"/></g>
+                  </g>
+                </g>
+                <g class="grad" fill="#4E6075" font-family="JetBrains Mono, monospace" font-size="7"> <!-- taste-skill-ignore: app UI inside [data-ui] -->
+                  <line x1="108" y1="107.5" x2="116" y2="107.5" stroke="rgba(255,255,255,.1)" stroke-width=".75"/><text x="105" y="110" text-anchor="end">75</text>
+                  <line x1="108" y1="169" x2="116" y2="169" stroke="rgba(255,255,255,.1)" stroke-width=".75"/><text x="105" y="171.5" text-anchor="end">50</text>
+                  <line x1="108" y1="230.5" x2="116" y2="230.5" stroke="rgba(255,255,255,.1)" stroke-width=".75"/><text x="105" y="233" text-anchor="end">25</text>
+                </g>
+                <rect x="5" y="46" width="4" height="242" rx="2" fill="rgba(255,255,255,.07)"/>
+                <rect x="113" y="46" width="2" height="242" rx="1" fill="rgba(255,255,255,.03)"/>
+                <rect x="8" y="182" width="104" height="22" rx="2" fill="rgba(255,255,255,.04)" stroke="rgba(255,255,255,.06)" stroke-width=".5"/>
+                <text class="vial-label" x="60" y="196.5" text-anchor="middle" fill="#A9B8CC" font-family="JetBrains Mono, monospace" font-size="9" font-weight="600">10 mg</text> <!-- taste-skill-ignore: app UI inside [data-ui] -->
+              </svg>
+              <button class="vial-motion" type="button" aria-label="Pause the vial animation" aria-pressed="false" hidden>
+                <svg viewBox="0 0 12 12" width="12" height="12" aria-hidden="true" focusable="false"><path class="i-pause" d="M3 2h2v8H3zM7 2h2v8H7z"/><path class="i-play" d="M3.5 2l6 4-6 4z"/></svg>
+              </button>
+            </div>
+
+            <div class="calc">
+              <div class="calc-card">
+                <label class="field" for="c-vial">
+                  <span class="field-label">Vial size</span>
+                  <span class="field-box">
+                    <svg class="field-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3.5c3.2 4 5.5 7 5.5 10a5.5 5.5 0 0 1-11 0c0-3 2.3-6 5.5-10z" fill="none" stroke="currentColor" stroke-width="1.6"/></svg>
+                    <input id="c-vial" type="text" inputmode="decimal" value="10" autocomplete="off" spellcheck="false" readonly aria-describedby="c-vial-unit">
+                    <span class="unit" id="c-vial-unit">mg</span>
+                  </span>
+                </label>
+                <label class="field" for="c-water">
+                  <span class="field-label">BAC water added</span>
+                  <span class="field-box">
+                    <svg class="field-icon lav" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3.5c3.2 4 5.5 7 5.5 10a5.5 5.5 0 0 1-11 0c0-3 2.3-6 5.5-10z" fill="none" stroke="currentColor" stroke-width="1.6"/></svg>
+                    <input id="c-water" type="text" inputmode="decimal" value="2" autocomplete="off" spellcheck="false" readonly aria-describedby="c-water-unit">
+                    <span class="unit" id="c-water-unit">ml</span>
+                  </span>
+                </label>
+                <label class="field" for="c-dose">
+                  <span class="field-label">Desired dose</span>
+                  <span class="field-box">
+                    <svg class="field-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M17 3.5l3.5 3.5M18.7 5.3l-2.1 2.1M15 5.6l3.4 3.4M16.6 7.4L8 16M5.5 18.5L8 16M4 20l1.5-1.5M10.6 8.1l1.7 1.7M8.6 10.1l1.7 1.7M6.6 12.1l1.7 1.7" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/><path d="M12.7 6L18 11.3 9.9 19.4 4.6 14.1z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/></svg>
+                    <input id="c-dose" type="text" inputmode="decimal" value="" placeholder="Your dose" autocomplete="off" spellcheck="false" readonly aria-describedby="c-dose-unit">
+                    <span class="unit" id="c-dose-unit">mcg</span>
+                  </span>
+                </label>
+              </div>
+
+              <div class="draw">
+                <div class="draw-top">
+                  <div class="draw-main">
+                    <p class="draw-eyebrow">Draw to</p> <!-- taste-skill-ignore: app UI inside [data-ui] -->
+                    <p class="draw-figure"><span class="draw-num" id="d-units">—</span><span class="draw-iu">IU</span></p>
+                    <p class="draw-cap"><span id="d-ml">—</span> ml · 1ml insulin syringe</p>
+                  </div>
+                  <div class="barrel-chip">
+                    <span class="barrel-label">OF BARREL</span>
+                    <span class="barrel-pct" id="d-pct">—</span>
+                  </div>
+                </div>
+                <div class="syr" aria-hidden="true">
+                  <div class="syr-ticks"><span data-tick="100">100</span><span data-tick="75">75</span><span data-tick="50">50</span><span data-tick="25">25</span><span data-tick="0">0</span></div>
+                  <div class="syr-body">
+                    <span class="syr-plunger"></span>
+                    <span class="syr-barrel"><span class="syr-mark" style="left:25%"></span><span class="syr-mark" style="left:50%"></span><span class="syr-mark" style="left:75%"></span><span class="syr-fill empty" id="d-fill"></span></span>
+                    <span class="syr-hub"></span>
+                    <span class="syr-needle"></span>
+                  </div>
+                </div>
+              </div>
+
+              <dl class="readout">
+                <div><dt>Concentration</dt><dd><span id="r-conc">5.00</span><small>mg/ml</small></dd></div>
+                <div><dt>Doses / vial</dt><dd><span id="r-doses">—</span></dd></div>
+              </dl>
+              <p class="sr-only" id="calc-status" aria-live="polite"></p>
+            </div>
+          </div>
+          <p class="stage-note">The calculator only does arithmetic on the numbers you enter. It does not recommend a dose or a compound.</p>
+        </div>
       </section>
 
-      <section class="legal-list">
-        <h2>Legal</h2>
-        <a href="/privacy">Privacy Policy</a>
-        <a href="/terms">Terms of Service</a>
-        <a href="/health-disclaimer">Health Disclaimer</a>
+      <!-- The daily loop: three statement buttons switch one Home screen; its row Log buttons work too. -->
+      <section class="loop wrap" id="how-it-works" aria-labelledby="loop-title">
+        <div class="loop-text">
+          <h2 id="loop-title">What you log comes off your stock.</h2>
+          <ol class="steps">
+            <li class="step is-active" data-step="1">
+              <h3><button class="step-btn" type="button" aria-pressed="true" aria-controls="home-demo">Log the dose in one tap.</button></h3>
+              <p>Today's doses are listed on Home. Tap Log on one and the time, the amount and, for an injection, the site are recorded.</p>
+            </li>
+            <li class="step" data-step="2">
+              <h3><button class="step-btn" type="button" aria-pressed="false" aria-controls="home-demo">Then the vial keeps count.</button></h3>
+              <p>What you drew comes off the open vial, so the level on screen is what is left inside it.</p>
+            </li>
+            <li class="step" data-step="3">
+              <h3><button class="step-btn" type="button" aria-pressed="false" aria-controls="home-demo">Then it warns you before you run out.</button></h3>
+              <p>When what you hold for a cycle will last two weeks or less, Home names it and says roughly how long it has left.</p>
+            </li>
+          </ol>
+        </div>
+
+        <div class="loop-stage">
+          <div class="phone" id="home-demo" data-ui data-state="1" role="group" tabindex="-1" aria-label="The Peptidly Home screen. The Log buttons work.">
+            <p class="sr-only" id="home-status" aria-live="polite"></p>
+            <div class="screen">
+              <div class="home-top">
+                <div>
+                  <p class="hello">Good morning</p>
+                  <p class="hello-name">Alex</p>
+                </div>
+                <div class="home-icons" aria-hidden="true">
+                  <span class="round-btn"><svg viewBox="0 0 24 24"><path d="M6 16.5V11a6 6 0 1 1 12 0v5.5l1.5 1.5h-15zM10 20a2 2 0 0 0 4 0" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/></svg></span>
+                  <span class="round-btn"><svg viewBox="0 0 24 24"><rect x="6" y="3.5" width="12" height="17" rx="2.5" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M9 7.5h6M9 12h.01M12 12h.01M15 12h.01M9 15h.01M12 15h.01M15 15h.01M9 18h.01M12 18h.01M15 18h.01" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></span>
+                  <span class="avatar">A</span>
+                </div>
+              </div>
+
+              <div class="nudge" aria-hidden="true">
+                <span class="nudge-dot"></span>
+                <span class="nudge-text"><span class="nudge-title">Running low: AM blend 2 mg</span><span class="nudge-sub">~2 wks left</span></span>
+                <svg class="nudge-chev" viewBox="0 0 24 24"><path d="M9 6l6 6-6 6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              </div>
+
+              <div class="cycle-card">
+                <div class="chips">
+                  <span class="chip chip-teal"><i></i>ACTIVE · DAY 20</span>
+                  <span class="chip chip-soft" data-cycle-quarter>Q4 2026</span>
+                  <span class="chip chip-faint">PRIMARY</span>
+                </div>
+                <p class="cycle-name">Winter cycle</p>
+                <p class="cycle-left"><b>38</b> days remaining</p>
+                <div class="bar"><span style="width:34%"></span></div>
+                <div class="cycle-dates"><span data-cycle-start>OCT 06</span><span class="teal">34% · TODAY</span><span data-cycle-end>DEC 02</span></div>
+                <span class="open-cycle"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 6l6 6-6 6" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>Open Cycle</span>
+              </div>
+
+              <div class="next-card">
+                <span class="next-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M12 7.5V12l3 2" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg></span>
+                <div class="next-text">
+                  <p class="next-eyebrow">NEXT DOSE</p> <!-- taste-skill-ignore: app UI inside [data-ui] -->
+                  <p class="next-title" data-next-title>AM blend · 250 mcg</p>
+                  <p class="next-when" data-next-when>in 12m · 08:00</p>
+                </div>
+                <span class="next-log" aria-hidden="true">Log</span>
+              </div>
+
+              <div class="today-head">
+                <span>TODAY · <span data-today>OCT 25</span> · <span data-taken-count>0</span>/2</span>
+                <span class="today-link">Calendar <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h13M13 7l5 5-5 5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+              </div>
+
+              <div class="today-list" role="list">
+              <div class="dose-row" role="listitem">
+                <svg class="mini-vial" viewBox="0 0 22 54" aria-hidden="true"><rect x="6.6" y="0" width="8.8" height="4" rx="1" fill="#2a3a54"/><rect x="2" y="6" width="18" height="46" rx="4" fill="#0c1725" stroke="rgba(255,255,255,.1)" stroke-width=".75"/><rect class="mini-fill" x="3" y="27" width="16" height="25" rx="3"/><rect x="4" y="10" width="2" height="34" rx="1" fill="rgba(255,255,255,.08)"/></svg>
+                <div class="dose-text">
+                  <p class="dose-name">AM blend <svg class="tick" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg></p>
+                  <p class="dose-meta">250 mcg <i>·</i> 08:00<span class="taken-meta"> <i>·</i> <em>Taken</em> <i>·</i> Left thigh</span></p>
+                  <p class="dose-draw">0.125 ml · 12.5 units</p>
+                  <p class="dose-site"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M19 8a7.5 7.5 0 0 0-13.4-1.6M5 4v3h3M5 16a7.5 7.5 0 0 0 13.4 1.6M19 20v-3h-3" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>Next site · <span>Left thigh</span></p>
+                </div>
+                <button class="row-log" type="button" data-log aria-label="Log AM blend">Log</button>
+                <span class="row-done" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7.5" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+              </div>
+
+              <div class="dose-row" role="listitem">
+                <svg class="mini-vial lav" viewBox="0 0 22 54" aria-hidden="true"><rect x="6.6" y="0" width="8.8" height="4" rx="1" fill="#2a3a54"/><rect x="2" y="6" width="18" height="46" rx="4" fill="#0c1725" stroke="rgba(255,255,255,.1)" stroke-width=".75"/><rect class="mini-fill" x="3" y="36" width="16" height="16" rx="3"/><rect x="4" y="10" width="2" height="34" rx="1" fill="rgba(255,255,255,.08)"/></svg>
+                <div class="dose-text">
+                  <p class="dose-name">PM blend <svg class="tick" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg></p>
+                  <p class="dose-meta">500 mcg <i>·</i> 20:00<span class="taken-meta"> <i>·</i> <em>Taken</em> <i>·</i> Right thigh</span></p>
+                  <p class="dose-draw">0.200 ml · 20.0 units</p>
+                  <p class="dose-site"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M19 8a7.5 7.5 0 0 0-13.4-1.6M5 4v3h3M5 16a7.5 7.5 0 0 0 13.4 1.6M19 20v-3h-3" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>Next site · <span>Right thigh</span></p>
+                </div>
+                <button class="row-log" type="button" data-log aria-label="Log PM blend">Log</button>
+                <span class="row-done" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7.5" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+              </div>
+              </div>
+            </div>
+
+            <div class="tabbar" aria-hidden="true">
+              <span class="tab on"><svg viewBox="0 0 24 24"><path d="M13.5 2.5L5 13.5h6l-1 8 8.5-11h-6z" fill="currentColor"/></svg>Home</span>
+              <span class="tab"><svg viewBox="0 0 24 24"><path d="M17 2.5l3 3-3 3M4 11.5v-1a5 5 0 0 1 5-5h11M7 21.5l-3-3 3-3M20 12.5v1a5 5 0 0 1-5 5H4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>Cycles</span>
+              <span class="tab"><svg viewBox="0 0 24 24"><path d="M12 2.8l8 4.4v9.6l-8 4.4-8-4.4V7.2zM4 7.2l8 4.4 8-4.4M12 11.6v9.6" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/></svg>Inventory</span>
+              <span class="tab"><svg viewBox="0 0 24 24"><rect x="3.5" y="5" width="17" height="15.5" rx="2.5" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M3.5 9.5h17M8 3v4M16 3v4M8 13h.01M12 13h.01M16 13h.01M8 16.5h.01M12 16.5h.01" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>Calendar</span>
+              <span class="tab"><svg viewBox="0 0 24 24"><path d="M12 8.6a3.4 3.4 0 1 0 0 6.8 3.4 3.4 0 0 0 0-6.8zm8.2 4.7l1.6 1.2-1.8 3.1-1.9-.7a7.6 7.6 0 0 1-1.9 1.1l-.3 2h-3.6l-.3-2a7.6 7.6 0 0 1-1.9-1.1l-1.9.7-1.8-3.1 1.6-1.2a7.4 7.4 0 0 1 0-2.6L2.2 9.5 4 6.4l1.9.7A7.6 7.6 0 0 1 7.8 6l.3-2h3.6l.3 2a7.6 7.6 0 0 1 1.9 1.1l1.9-.7 1.8 3.1-1.6 1.2a7.4 7.4 0 0 1 0 2.6z" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/></svg>Settings</span>
+            </div>
+          </div>
+        </div>
       </section>
 
-      <section class="contact">
-        <p>Questions? Email <a href="mailto:hello@peptidly.co.uk">hello@peptidly.co.uk</a></p>
+      <!-- Scheduling: one tall panel from the Add compound screen, with notes level with its controls. -->
+      <section class="cycles" id="cycles" aria-labelledby="cycles-title">
+        <div class="wrap">
+          <h2 id="cycles-title">Cycles, the way you run them.</h2>
+          <p class="section-lead">Each compound in a cycle carries its own schedule. This is the panel you fill in when you add one.</p>
+          <div class="plate">
+            <ul class="notes notes-left">
+              <li class="note" data-for="p-titrate" style="--top:2%"><h3>Ramp up or taper</h3><p>Step the dose up or down on dates you choose.</p></li>
+              <li class="note" data-for="p-start" style="--top:28%"><h3>A start for each compound</h3><p>Already taking it, starting tomorrow, or on a date of your choosing.</p></li>
+              <li class="note" data-for="p-freq" style="--top:52%"><h3>Nine schedules</h3><p>Daily, twice daily, every other day, twice or three times a week, 5 on 2 off, weekly, every few days, or on and off blocks.</p></li>
+            </ul>
+
+            <div class="sheet" data-ui role="group" aria-label="The Schedule panel from the Add compound screen">
+              <div class="p-card p-toggle" id="p-titrate">
+                <div><p class="p-title">Titrate the dose over time<span class="sr-only">, on</span></p><p class="p-sub">Step the dose up or down on set dates (e.g. a ramp-up).</p></div>
+                <span class="switch on" aria-hidden="true"><i></i></span>
+              </div>
+
+              <p class="p-eyebrow">WHEN DOES IT START?</p> <!-- taste-skill-ignore: app UI inside [data-ui] -->
+              <div class="p-chips" id="p-start">
+                <span class="p-chip">Already taking it</span><span class="p-chip">Today</span><span class="p-chip on">Tomorrow<span class="sr-only"> (selected)</span></span><span class="p-chip">Pick a date</span>
+              </div>
+
+              <p class="p-eyebrow">SCHEDULE</p> <!-- taste-skill-ignore: app UI inside [data-ui] -->
+              <div class="p-card">
+                <div class="p-chips" id="p-freq">
+                  <span class="p-chip dark">Daily</span><span class="p-chip dark on">Twice daily<span class="sr-only"> (selected)</span></span><span class="p-chip dark">EOD</span><span class="p-chip dark">Twice weekly</span><span class="p-chip dark">3× weekly</span><span class="p-chip dark">5-on-2-off</span><span class="p-chip dark">Weekly</span><span class="p-chip dark">Every X days</span><span class="p-chip dark">On / off cycle</span>
+                </div>
+                <div class="p-row" id="p-days">
+                  <div><p class="p-title">Only on certain days<span class="sr-only">, off</span></p><p class="p-sub">e.g. mornings and evenings, Monday to Friday</p></div>
+                  <span class="switch" aria-hidden="true"><i></i></span>
+                </div>
+                <div class="p-times" id="p-times"><span class="p-time">08:00</span><span class="p-time">20:00</span><span class="p-time add" aria-hidden="true">+</span></div>
+              </div>
+
+              <div class="p-card p-window" id="p-window">
+                <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8.5" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M12 7.5V12l3 2" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+                <div><p class="p-eyebrow tight">ACTIVE WINDOW · LENGTH</p><p class="p-value">same as cycle</p></div> <!-- taste-skill-ignore: app UI inside [data-ui] -->
+                <svg class="p-chev" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              </div>
+
+              <p class="p-eyebrow">INVENTORY</p> <!-- taste-skill-ignore: app UI inside [data-ui] -->
+              <div class="p-card" id="p-stock">
+                <div class="p-field"><p class="p-eyebrow tight">VIALS IN STOCK</p><p class="p-field-row"><span class="p-num">3</span><span class="p-unit">vials</span></p></div> <!-- taste-skill-ignore: app UI inside [data-ui] -->
+              </div>
+            </div>
+
+            <ul class="notes notes-right">
+              <li class="note" data-for="p-days" style="--top:60%"><h3>Only on certain days</h3><p>Weekdays only, or mornings and evenings, set once.</p></li>
+              <li class="note" data-for="p-times" style="--top:70%"><h3>A reminder per time</h3><p>Each time gets its own reminder, with quiet hours when you want them.</p></li>
+              <li class="note" data-for="p-window" style="--top:80%"><h3>Its own window</h3><p>A compound can run for the whole cycle or only part of it.</p></li>
+              <li class="note" data-for="p-stock" style="--top:92%"><h3>Tied to your stock</h3><p>Vials you hold are counted down as you log.</p></li>
+            </ul>
+          </div>
+        </div>
+      </section>
+
+      <!-- Privacy: specific facts in two-ended rows, each one taken from the privacy policy. -->
+      <section class="privacy" id="privacy" aria-labelledby="privacy-title">
+        <div class="wrap privacy-grid">
+          <div class="privacy-head">
+            <h2 id="privacy-title">Privacy, in plain words.</h2>
+            <p class="section-lead">What you record is personal. These are the main facts; the privacy policy has the rest.</p>
+            <a class="text-link" href="/privacy">Read the privacy policy<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h13M13 7l5 5-5 5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></a>
+          </div>
+          <div class="facts">
+            <h3 class="facts-group">Stored</h3>
+            <dl class="facts-rows">
+              <div><dt>On your phone</dt><dd>In the app's private storage</dd></div>
+              <div><dt>A copy in the cloud</dt><dd>West EU, Ireland</dd></div>
+              <div><dt>The cloud copy</dt><dd>Encrypted in transit and at rest</dd></div>
+              <div><dt>Without a signal</dt><dd>Keeps working, syncs later</dd></div>
+            </dl>
+            <h3 class="facts-group">Never taken from your phone</h3>
+            <dl class="facts-rows">
+              <div><dt>Your location</dt><dd>The app never asks for it</dd></div>
+              <div><dt>Contacts and photos</dt><dd>Not read</dd></div>
+              <div><dt>Advertising ID</dt><dd>Not collected</dd></div>
+            </dl>
+            <h3 class="facts-group">Yours to control</h3>
+            <dl class="facts-rows">
+              <div><dt>Ads</dt><dd>None, and your data is never sold</dd></div>
+              <div><dt>Usage data</dt><dd>Never includes compound names, dose amounts or notes · can be switched off</dd></div>
+              <div><dt>Export</dt><dd>Cycles, vials and dose logs as JSON, free</dd></div>
+              <div><dt>Leaving</dt><dd>Delete your account in the app · 30 days to change your mind</dd></div>
+            </dl>
+          </div>
+        </div>
+      </section>
+
+      <!-- Questions: one tile open at a time. -->
+      <section class="faq" id="faq" aria-labelledby="faq-title">
+        <div class="wrap faq-grid">
+          <h2 id="faq-title">Questions, answered.</h2>
+          <div class="faq-list">
+            <details name="faq" open>
+              <summary>What does it cost?<span class="pm" aria-hidden="true"></span></summary>
+              <div class="answer"><p>Peptidly is free to start and has no ads. The JSON export of your data is always free.</p></div>
+            </details>
+            <details name="faq">
+              <summary>Is there an iPhone version?<span class="pm" aria-hidden="true"></span></summary>
+              <div class="answer"><p>No. Peptidly is an Android app on Google Play, and it runs on Android 7.0 and newer.</p></div>
+            </details>
+            <details name="faq">
+              <summary>Does Peptidly give medical advice?<span class="pm" aria-hidden="true"></span></summary>
+              <div class="answer"><p>No. It records what you plan and log, and its arithmetic only uses the numbers you enter. It does not recommend compounds. Always consult a qualified clinician before starting, changing or stopping any protocol.</p></div>
+            </details>
+            <details name="faq">
+              <summary>Does it work without a connection?<span class="pm" aria-hidden="true"></span></summary>
+              <div class="answer"><p>Yes. What you log is saved on your phone first and syncs to your account when you are back online.</p></div>
+            </details>
+            <details name="faq">
+              <summary>Can I move to a new phone?<span class="pm" aria-hidden="true"></span></summary>
+              <div class="answer"><p>Yes. Sign in on the new phone and your cycles, vials and dose history come with you.</p></div>
+            </details>
+            <details name="faq">
+              <summary>What can it track?<span class="pm" aria-hidden="true"></span></summary>
+              <div class="answer"><p>Vials you reconstitute, ready-mixed bottles and nasal sprays, in mcg or mg, with blends, injection sites and notes.</p></div>
+            </details>
+            <details name="faq">
+              <summary>Which languages does it speak?<span class="pm" aria-hidden="true"></span></summary>
+              <div class="answer"><p>English, Spanish, Romanian and Italian.</p></div>
+            </details>
+            <details name="faq">
+              <summary>Found a problem, or have an idea?<span class="pm" aria-hidden="true"></span></summary>
+              <div class="answer"><p>Use Send feedback in Settings, or email <a href="mailto:hello@peptidly.co.uk">hello@peptidly.co.uk</a>. Every message is read.</p></div>
+            </details>
+          </div>
+        </div>
+      </section>
+
+      <!-- Close: the accent field, the action, and Home as it looks before the first cycle. -->
+      <section class="cta" aria-labelledby="cta-title">
+        <div class="wrap cta-grid">
+          <div class="cta-copy">
+            <h2 id="cta-title">Start your first cycle.</h2>
+            <p>Install Peptidly from Google Play. It is free to start, with no ads.</p>
+            <a class="play" href="https://play.google.com/store/apps/details?id=com.peptidly.app&amp;referrer=utm_source%3Dpeptidly.co.uk%26utm_medium%3Dweb">
+              <img src="/assets/google-play-badge.png" alt="Get it on Google Play" width="646" height="250" loading="lazy">
+            </a>
+          </div>
+          <div class="welcome" data-ui role="group" aria-label="Peptidly Home before your first cycle">
+            <p class="hello">Good morning</p>
+            <p class="hello-name">Alex</p>
+            <div class="welcome-body">
+              <span class="welcome-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M9.5 3.5h5M10.5 3.5v5.2L5.4 17.4A2.2 2.2 0 0 0 7.3 20.7h9.4a2.2 2.2 0 0 0 1.9-3.3l-5.1-8.7V3.5M7.8 14.5h8.4" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+              <p class="welcome-title">Welcome to Peptidly</p>
+              <p class="welcome-sub">Create your first peptide cycle<br>to start tracking doses.</p>
+              <span class="welcome-btn">Create Cycle</span>
+            </div>
+          </div>
+        </div>
       </section>
     </main>
-    <footer>
-      <a href="/privacy">Privacy</a> ·
-      <a href="/terms">Terms</a> ·
-      <a href="/health-disclaimer">Health Disclaimer</a>
-      <p class="copyright">© 2026 Peptidly</p>
-      <p class="trademark">Google Play and the Google Play logo are trademarks of Google LLC.</p>
+
+    <footer class="foot wrap">
+      <div class="tiles">
+        <div class="tile tile-statement">
+          <p class="statement">No medical advice, just record-keeping for people who already know what they're doing.</p>
+          <p class="small">For adults 18 and over. Peptidly has no relationship with any peptide manufacturer, distributor or vendor.</p>
+        </div>
+        <nav class="tile tile-nav" aria-label="Legal">
+          <a href="/privacy">Privacy policy</a>
+          <a href="/terms">Terms of service</a>
+          <a href="/health-disclaimer">Health disclaimer</a>
+        </nav>
+        <div class="tile tile-mail">
+          <p class="small">Built solo. Every message is read.</p>
+          <a href="mailto:hello@peptidly.co.uk">hello@<wbr>peptidly.co.uk</a>
+        </div>
+        <div class="tile tile-word" aria-hidden="true"><span>PEPTIDLY</span></div>
+        <a class="tile tile-go" href="https://play.google.com/store/apps/details?id=com.peptidly.app&amp;referrer=utm_source%3Dpeptidly.co.uk%26utm_medium%3Dweb">
+          <span>Get it on Google Play</span>
+          <svg viewBox="0 0 48 48" aria-hidden="true"><path d="M10 38L38 10M16 10h22v22" fill="none" stroke="currentColor" stroke-width="4" stroke-linecap="square"/></svg>
+        </a>
+      </div>
+      <p class="legal">© 2026 Peptidly · Google Play and the Google Play logo are trademarks of Google LLC.</p>
     </footer>
   </body>
 </html>
