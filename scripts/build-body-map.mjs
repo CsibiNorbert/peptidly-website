@@ -22,13 +22,14 @@ const s = await import(pathToFileURL(path.join(helix, 'lib', 'dose-log', 'sites.
 const demo = await import(pathToFileURL(path.join(root, 'picker.js')).href);
 const en = JSON.parse(fs.readFileSync(path.join(helix, 'locales', 'en.json'), 'utf8')).injectionSites;
 
+const attr = (s) => s.replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;');
 const n = (v) => String(Math.round(v * 100) / 100);
 const zone = (key, sh, label) => {
   // One tappable area. The badge is drawn for every area and shown only on the suggested one.
   const bw = Math.max(30, 12 + en.next.length * 5.2);
   const cx = sh.x + sh.w / 2;
   const next = key === demo.NEXT ? ' is-next' : '';
-  return `<g class="zone${next}" data-site="${key}" data-state="${demo.zoneState(key, demo.NEXT)}" aria-label="${label}">` +
+  return `<g class="zone${next}" data-site="${key}" data-state="${demo.zoneState(key, demo.NEXT)}" aria-label="${attr(label)}">` +
     `<rect x="${n(sh.x)}" y="${n(sh.y)}" width="${n(sh.w)}" height="${n(sh.h)}" rx="${sh.r}"/>` +
     `<g class="badge" aria-hidden="true"><rect x="${n(cx - bw / 2)}" y="${n(sh.y - 7)}" width="${n(bw)}" height="13" rx="6.5"/>` +
     `<text x="${n(cx)}" y="${n(sh.y + 2.5)}" text-anchor="middle">${en.next}</text></g></g>`;
@@ -64,15 +65,16 @@ function view(v) {
     }
     for (const key of g.FRONT_REGIONS) parts.push(zone(key, g.FRONT[key], en.name[key]));
   } else {
-    for (const key of g.BACK_REGIONS) parts.push(zone(key, g.BACK[key], en.name[key]));
+    // Arms before glutes: DOM order is the arrow-key order, so it runs top to bottom like the front.
     for (const key of g.BACK_ARM_KEYS) {
       const sh = g.BACK[key];
       parts.push(`<g transform="${g.ARM_TRANSFORM[sh.local]}">${zone(key, sh, en.name[key])}</g>`);
     }
+    for (const key of g.BACK_REGIONS) parts.push(zone(key, g.BACK[key], en.name[key]));
   }
   // role=group, not the default img: children of an img are presentational, which would hide the buttons.
   const name = v === 'front' ? 'Front of the body' : 'Back of the body';
-  return `<svg class="body-map" data-view="${v}" viewBox="0 0 ${g.VIEW_BOX.w} ${g.VIEW_BOX.h}" role="group" aria-label="${name}" data-hint="${v === 'front' ? en.bodyHintFront : en.bodyHintBack}" focusable="false"${v === 'back' ? ' hidden' : ''}>
+  return `<svg class="body-map" data-view="${v}" viewBox="0 0 ${g.VIEW_BOX.w} ${g.VIEW_BOX.h}" role="group" aria-label="${name}" data-hint="${attr(v === 'front' ? en.bodyHintFront : en.bodyHintBack)}" focusable="false"${v === 'back' ? ' hidden' : ''}>
 ${DEFS(id)}
 <g mask="url(#${id}-mask)">
 ${FIGURE(id)}

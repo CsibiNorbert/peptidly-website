@@ -451,7 +451,7 @@ import * as site from './picker.js';
     var groups = [
       '.hero-stage',
       '.loop h2, .loop .step, .loop-stage',
-      '.reminders-text > *, .lock',
+      '.reminders-text > *, .lock, .reminders-facts',
       '.sites-text > *, .picker',
       '.cycles h2, .cycles .section-lead, .sheet, .note',
       '.privacy-head > *, .facts-group, .facts-rows > div',
@@ -502,6 +502,7 @@ import * as site from './picker.js';
     items.forEach(function (el, i) {
       el.addEventListener('click', function () { take(el); });
       el.addEventListener('keydown', function (e) {
+        if (e.altKey || e.ctrlKey || e.metaKey) return; // leave browser shortcuts (Alt+Left is Back) alone
         var step = e.key === 'ArrowRight' || e.key === 'ArrowDown' ? 1 : e.key === 'ArrowLeft' || e.key === 'ArrowUp' ? -1 : 0;
         if (step) {
           e.preventDefault();
@@ -545,15 +546,20 @@ import * as site from './picker.js';
       });
     };
     var chips = $$('.t-chip', timing);
-    radioGroup(chips, function (b) { return b.getAttribute('aria-checked') === 'true'; }, function (b) {
-      if (b.getAttribute('aria-checked') === 'true') return;
-      chips.forEach(function (x) { x.setAttribute('aria-checked', x === b ? 'true' : 'false'); });
+    var show = function (b) {
       var lead = Number(b.getAttribute('data-lead'));
       var at = clock(DOSE_AT - lead);
       lockTime.textContent = at;
       if (timingStatus) timingStatus.textContent = 'The reminder arrives at ' + at + (lead ? ', ' + lead + ' minutes before the dose.' : ', at the dose time.');
+    };
+    var checked = function (b) { return b.getAttribute('aria-checked') === 'true'; };
+    radioGroup(chips, checked, function (b) {
+      if (checked(b)) return;
+      chips.forEach(function (x) { x.setAttribute('aria-checked', x === b ? 'true' : 'false'); });
+      show(b);
       arrive([doseNotif]);
     });
+    show(chips.filter(checked)[0]); // the clock and the status line come from the checked choice, not the HTML
     timing.hidden = false; // the choice only works with the script, so it only shows with it
     // The cards drop in as the lock screen starts to rise into view (the same moment as its entrance), so
     // they are never seen first and then replayed.
@@ -612,12 +618,13 @@ import * as site from './picker.js';
           picked = z.getAttribute('data-site');
           var warn = paint();
           syncs.forEach(function (s) { s(); });
-          if (pickStatus) pickStatus.textContent = nameOf(z) + ' picked.' + (warn ? ' ' + warn : '');
+          // The radio announces its own name; only the warning needs saying.
+          if (pickStatus) pickStatus.textContent = warn;
         }));
     });
 
     var toggle = $('.view-toggle', picker);
-    var viewBtns = $$('[data-view-btn]', toggle);
+    var viewBtns = toggle ? $$('[data-view-btn]', toggle) : [];
     radioGroup(viewBtns, function (b) { return b.getAttribute('aria-checked') === 'true'; }, function (b) {
       var v = b.getAttribute('data-view-btn');
       viewBtns.forEach(function (x) { x.setAttribute('aria-checked', x === b ? 'true' : 'false'); });
@@ -628,7 +635,7 @@ import * as site from './picker.js';
         if (on) pickHint.textContent = svg.getAttribute('data-hint');
       });
     });
-    toggle.hidden = false; // the back of the body is only reachable with the script, so the switch waits for it
+    if (toggle) toggle.hidden = false; // the back of the body is only reachable with the script, so the switch waits for it
     paint();
   }
 

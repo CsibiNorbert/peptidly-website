@@ -122,6 +122,10 @@ a:hover { color: var(--accent-hover); }
 }
 .skip:focus { top: 12px; }
 
+/* Words that only make sense once the script has made something work. */
+.js-only { display: none; }
+.js .js-only { display: inline; }
+
 .sr-only {
   position: absolute;
   width: 1px;
@@ -1290,6 +1294,7 @@ h2 {
 @keyframes notif-in { from { opacity: 0; transform: translateY(-14px) scale(0.98); } to { opacity: 1; transform: none; } }
 
 .timing { margin-top: 32px; }
+.timing-try { margin-bottom: 20px; font-size: var(--step-xs); color: var(--muted); }
 .timing-label { font-size: 13px; font-weight: 600; letter-spacing: 0.04em; color: var(--muted); }
 .timing-chips { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
 [data-ui] .t-chip {
