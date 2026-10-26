@@ -25,7 +25,8 @@ peptidly-website/
 ├── assets/fonts/                   ← Inter and JetBrains Mono (latin, variable), self-hosted, OFL
 └── scripts/
     ├── build-from-content.mjs      ← reads ../Peptides/helix/legal/content.ts → renders the three .html files
-    └── check-calculator.mjs        ← checks calc.js against the app's own functions
+    ├── check-calculator.mjs        ← checks calc.js against the app's own functions
+    └── check-no-doses.mjs          ← fails if a dose figure appears on the page
 ```
 
 ## Updating the legal text
@@ -77,6 +78,15 @@ Peptides repo and exits 1 on any difference. Where a figure cannot be computed f
 the page shows an em dash, and it shows the concentration before a dose is entered. The app's
 calculator screen shows zeros in those states instead. The page never fills in a dose: the dose field
 starts empty.
+The page shows no dose anywhere. In the app replicas every amount (dose, draw, vial size) is a
+blurred stand-in inside a `.mask` chip, and a caption under the Home screen says so. To check:
+
+```bash
+node scripts/check-no-doses.mjs
+```
+
+It exits 1 on any number followed by mcg, mg, ml, units or IU in `index.html` or `home.js`, except
+"1 ml insulin syringe", "3 ml vial" and the hero vial's "10 mg" label.
 
 ## Local preview
 
