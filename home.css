@@ -750,8 +750,8 @@ h2 {
 }
 /* "You can press this": a green ring (the colour a dose turns once it is Taken) leaves each control the
    visitor can use in the replicas. Two rings, under 5 s a burst (WCAG 2.2.2); home.js re-runs a burst when
-   the screen comes back into view, and stops for good once the visitor has used it. */
-[data-ui] .row-log.pulse,
+   the screen comes back into view, at most three per visit, and stops for good once the visitor has used it. */
+[data-ui].phone:not(.tried) .row-log.pulse,
 [data-ui] .field-box.wants.pulse { animation: tap-ring 2.2s ease-out 2; animation-delay: var(--pulse-delay, 0s); }
 @keyframes tap-ring {
   0% { box-shadow: 0 0 0 0 rgba(74, 222, 128, 0.6); } /* taste-skill-ignore: app UI inside [data-ui] */

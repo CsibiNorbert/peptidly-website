@@ -101,17 +101,25 @@ import { parseDecimal, positive, drawTo, reconstitute } from './calc.js';
   if (reduceMotion.addEventListener) reduceMotion.addEventListener('change', updateMotion);
   else if (reduceMotion.addListener) reduceMotion.addListener(updateMotion); // Safari before 14
 
-  // One burst of the green "you can press this" ring on each element, 0.5 s apart. Restarting the class
-  // restarts the animation; reduced motion gets no ring (the dose field's teal border and the Log tag stay).
+  // One burst of the green "you can press this" ring on each element, 0.5 s apart, at most three bursts
+  // per element per visit. The class comes off when the burst ends, so nothing replays it by accident (a
+  // button shown again, a field that wants a dose again), and a burst already running is left alone.
+  // Reduced motion: no ring (the dose field's teal border and the Log tag stay).
   function pulse(els) {
     if (reduceMotion.matches) return;
+    els = els.filter(function (el) {
+      var n = Number(el.getAttribute('data-pulses') || 0);
+      return !el.classList.contains('pulse') && n < 3;
+    });
     els.forEach(function (el, i) {
-      el.classList.remove('pulse');
-      void el.offsetWidth;
+      el.setAttribute('data-pulses', String(Number(el.getAttribute('data-pulses') || 0) + 1));
       el.style.setProperty('--pulse-delay', (i * 0.5) + 's');
       el.classList.add('pulse');
     });
   }
+  function endPulse(e) { if (e.animationName === 'tap-ring') e.target.classList.remove('pulse'); }
+  document.addEventListener('animationend', endPulse);
+  document.addEventListener('animationcancel', endPulse);
 
   function rippleVial() {
     if (!ripple || reduceMotion.matches) return;
@@ -319,7 +327,6 @@ import { parseDecimal, positive, drawTo, reconstitute } from './calc.js';
         takenState = [Number(phone.getAttribute('data-state')) >= 2, false];
         render(takenState);
         say('The demo has reset.');
-        pulseLog();
         keepFocus();
       }, 3200);
     }
@@ -338,7 +345,8 @@ import { parseDecimal, positive, drawTo, reconstitute } from './calc.js';
     clearTimeout(resetTimer);
     takenState = [n >= 2, false];
     render(takenState);
-    if (String(n) !== was) pulseLog();
+    // Steps 1 and 2 are about pressing Log; step 3 is about the banner, so nothing else moves then.
+    if (String(n) !== was && n !== 3) pulseLog();
     $('.nudge', phone).setAttribute('aria-hidden', n === 3 ? 'false' : 'true');
     keepFocus();
     $$('.step').forEach(function (s) {
