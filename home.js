@@ -39,11 +39,15 @@ import { parseDecimal, positive, drawTo, reconstitute } from './calc.js';
 
   // The surface and bubbles move as the app's do (vial.jsx): two sines, the phase gaining 0.04 a frame at
   // 60 Hz, so 2.4 a second here at any refresh rate. Coordinates are the liquid group's, 0 at the surface.
+  // The maths runs in the app's own units for its default 84-wide vial (the app draws it 80-100 wide), scaled up by S to
+  // this 120-wide one, so the waves keep the app's proportions instead of shrinking to 2.5 % of the width.
+  var S = 120 / 84;
   function surface(ph) {
     var amp = Math.min(3, level / 20);
     var d = '';
     for (var x = 4; x <= 116; x += 3) {
-      var y = Math.sin(x * 0.08 + ph) * amp + Math.sin(x * 0.18 + ph * 1.3) * amp * 0.4;
+      var xa = x / S;
+      var y = (Math.sin(xa * 0.08 + ph) * amp + Math.sin(xa * 0.18 + ph * 1.3) * amp * 0.4) * S;
       d += (d ? 'L' : 'M') + x + ' ' + y.toFixed(2);
     }
     return d + 'L116 270H4Z';
@@ -54,8 +58,8 @@ import { parseDecimal, positive, drawTo, reconstitute } from './calc.js';
     waves[1].setAttribute('d', surface(phase + 1.8));
     var span = Math.max(1, level * 2.46 - 20);
     bubbles.forEach(function (b, i) {
-      b.setAttribute('cx', (10 + ((phase * 10 + i * 23) % 104)).toFixed(1));
-      b.setAttribute('cy', (12 + ((phase * 20 + i * 40) % span)).toFixed(1));
+      b.setAttribute('cx', (10 + (((phase * 10 + i * 23) * S) % 104)).toFixed(1));
+      b.setAttribute('cy', (12 + (((phase * 20 + i * 40) * S) % span)).toFixed(1));
     });
   }
 
