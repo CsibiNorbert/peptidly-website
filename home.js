@@ -231,10 +231,11 @@ import { parseDecimal, positive, drawTo, reconstitute } from './calc.js';
 
   var phone = $('.phone');
   var rows = phone ? $$('.dose-row', phone) : [];
-  // Numbers that add up: 250 mcg from a 2 mg vial is 12.5 % of it; 500 mcg from a 5 mg vial is 10 %.
+  // The page names no dose: the amounts on this screen are masked, and none is written here either.
+  // A Log drops the row's vial by a plausible step (62.5 -> 50 %, 40 -> 30 %).
   var DATA = [
-    { name: 'AM blend', title: 'AM blend · 250 mcg', when: 'in 12m · 08:00', before: 62.5, after: 50 },
-    { name: 'PM blend', title: 'PM blend · 500 mcg', when: 'in 12h 12m · 20:00', before: 40, after: 30 }
+    { name: 'AM blend', when: 'in 12m · 08:00', before: 62.5, after: 50 },
+    { name: 'PM blend', when: 'in 12h 12m · 20:00', before: 40, after: 30 }
   ];
   var resetTimer = 0;
 
@@ -262,7 +263,7 @@ import { parseDecimal, positive, drawTo, reconstitute } from './calc.js';
     var card = $('.next-card', phone);
     card.classList.toggle('all-done', next === -1);
     var shown = DATA[next === -1 ? DATA.length - 1 : next];
-    $('[data-next-title]', phone).textContent = shown.title;
+    $('[data-next-name]', phone).textContent = shown.name;
     $('[data-next-when]', phone).textContent = shown.when;
   }
 
