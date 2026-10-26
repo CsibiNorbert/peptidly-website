@@ -78,15 +78,20 @@ Peptides repo and exits 1 on any difference. Where a figure cannot be computed f
 the page shows an em dash, and it shows the concentration before a dose is entered. The app's
 calculator screen shows zeros in those states instead. The page never fills in a dose: the dose field
 starts empty.
-The page shows no dose anywhere. In the app replicas every amount (dose, draw, vial size) is a
-blurred stand-in inside a `.mask` chip, and a caption under the Home screen says so. To check:
+
+The site shows no dose. In the app replicas every dose and draw, and the low-stock banner's vial size,
+is a `.mask` chip: blurred stand-in 8s that come from CSS (`data-d`), so without styles the chip is empty
+rather than a figure. A caption under the Home screen says amounts are blurred. The hero calculator keeps
+its example vial (10 mg, 2 ml, 5.00 mg/ml), which is the visitor's input, not a dose. To check:
 
 ```bash
 node scripts/check-no-doses.mjs
 ```
 
-It exits 1 on any number followed by mcg, mg, ml, units or IU in `index.html` or `home.js`, except
-"1 ml insulin syringe", "3 ml vial" and the hero vial's "10 mg" label.
+It scans every `.html`, `.js` and `.css` file at the site root and exits 1 on a number followed by mcg,
+mg, ml, units, U or IU (in HTML, also across tags and `&nbsp;`), or on a mask holding anything but 8s.
+Allowed: "1 ml insulin syringe", "3 ml vial", the hero vial's "10 mg" label and concentrations (mg/ml).
+It reads literal text only, so a figure assembled in JavaScript would get past it.
 
 ## Local preview
 
