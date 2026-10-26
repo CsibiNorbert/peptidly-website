@@ -1,6 +1,7 @@
 /* Peptidly landing page: the calculator, the Home screen demo, and the motion layer.
    No dependencies, no network, nothing stored. Every part degrades to the static HTML. */
 import { parseDecimal, positive, drawTo, reconstitute } from './calc.js';
+import * as site from './picker.js';
 
 (function () {
   'use strict';
@@ -450,6 +451,8 @@ import { parseDecimal, positive, drawTo, reconstitute } from './calc.js';
     var groups = [
       '.hero-stage',
       '.loop h2, .loop .step, .loop-stage',
+      '.reminders-text > *, .lock, .reminders-facts',
+      '.sites-text > *, .picker',
       '.cycles h2, .cycles .section-lead, .sheet, .note',
       '.privacy-head > *, .facts-group, .facts-rows > div',
       '.faq h2, .faq details',
@@ -485,6 +488,160 @@ import { parseDecimal, positive, drawTo, reconstitute } from './calc.js';
         revealer.observe(el);
       });
     });
+  }
+
+  /* ---------- One choice from a set (the WAI-ARIA radio group pattern) ---------- */
+
+  // One tab stop for the set; the arrow keys move the choice, Space or Enter takes the focused one.
+  function radioGroup(items, isChecked, choose) {
+    var sync = function () {
+      var any = items.some(isChecked);
+      items.forEach(function (el, i) { el.setAttribute('tabindex', isChecked(el) || (!any && i === 0) ? '0' : '-1'); });
+    };
+    var take = function (el, byKey) { choose(el, byKey); sync(); };
+    items.forEach(function (el, i) {
+      el.addEventListener('click', function () { take(el, false); });
+      el.addEventListener('keydown', function (e) {
+        if (e.altKey || e.ctrlKey || e.metaKey) return; // leave browser shortcuts (Alt+Left is Back) alone
+        var step = e.key === 'ArrowRight' || e.key === 'ArrowDown' ? 1 : e.key === 'ArrowLeft' || e.key === 'ArrowUp' ? -1 : 0;
+        if (step) {
+          e.preventDefault();
+          var next = items[(i + step + items.length) % items.length];
+          take(next, true);
+          next.focus();
+        } else if ((e.key === ' ' || e.key === 'Enter') && el.tagName !== 'BUTTON') {
+          // a <button> turns these into a click by itself
+          e.preventDefault();
+          take(el, true);
+        }
+      });
+    });
+    sync();
+    return sync;
+  }
+
+  /* ---------- Reminders: the timing choice moves the lock screen ---------- */
+
+  var lock = $('.lock');
+  var timing = $('.timing');
+  if (lock && timing) {
+    var DOSE_AT = 8 * 60; // the example dose is due at 08:00
+    var lockTime = $('[data-lock-time]', lock);
+    var doseNotif = $('[data-notif-dose]', lock);
+    var timingStatus = $('#timing-status');
+    var DAY_NAMES = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+    var MONTH_NAMES = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+    var now = new Date();
+    $('[data-lock-date]', lock).textContent = DAY_NAMES[now.getDay()] + ' ' + now.getDate() + ' ' + MONTH_NAMES[now.getMonth()];
+
+    var clock = function (mins) { return String(Math.floor(mins / 60)).padStart(2, '0') + ':' + String(mins % 60).padStart(2, '0'); };
+    // A notification arrives the way Android shows one: it drops in from above. Once per arrival, 420 ms.
+    var arrive = function (els) {
+      if (reduceMotion.matches) return;
+      els.forEach(function (el, i) {
+        el.classList.remove('arrive');
+        void el.offsetWidth;
+        el.style.setProperty('--notif-delay', (i * 0.14) + 's');
+        el.classList.add('arrive');
+      });
+    };
+    var chips = $$('.t-chip', timing);
+    var show = function (b) {
+      var lead = Number(b.getAttribute('data-lead'));
+      var at = clock(DOSE_AT - lead);
+      lockTime.textContent = at;
+      if (timingStatus) timingStatus.textContent = 'The reminder arrives at ' + at + (lead ? ', ' + lead + ' minutes before the dose.' : ', at the dose time.');
+    };
+    var checked = function (b) { return b.getAttribute('aria-checked') === 'true'; };
+    radioGroup(chips, checked, function (b) {
+      if (checked(b)) return;
+      chips.forEach(function (x) { x.setAttribute('aria-checked', x === b ? 'true' : 'false'); });
+      show(b);
+      arrive([doseNotif]);
+    });
+    var first = chips.filter(checked)[0] || chips[0];
+    if (first) show(first); // the clock and the status line come from the checked choice, not the HTML
+    timing.hidden = false; // the choice only works with the script, so it only shows with it
+    // The cards drop in as the lock screen starts to rise into view (the same moment as its entrance), so
+    // they are never seen first and then replayed.
+    if ('IntersectionObserver' in window) {
+      new IntersectionObserver(function (entries, obs) {
+        if (!entries[0].isIntersecting) return;
+        arrive($$('.notif', lock).reverse()); // the older alert first, then the reminder on top of it
+        obs.disconnect();
+      }, { threshold: 0 }).observe(lock);
+    }
+  }
+
+  /* ---------- Site rotation: the dose screen's body picker ---------- */
+
+  var picker = $('.picker');
+  if (picker) {
+    var picked = site.NEXT; // the app preselects its suggestion
+    var allZones = $$('.zone', picker);
+    var pickLabel = $('[data-pick-label]', picker);
+    var pickWarn = $('[data-pick-warn]', picker);
+    var pickHint = $('[data-pick-hint]', picker);
+    var pickStatus = $('#pick-status');
+    var nameOf = function (z) { return z.getAttribute('data-name'); };
+    var pickable = function (z) { return site.OFF.indexOf(z.getAttribute('data-site')) === -1; };
+
+    allZones.forEach(function (z) {
+      var key = z.getAttribute('data-site');
+      z.setAttribute('data-name', z.getAttribute('aria-label'));
+      z.setAttribute('aria-label', nameOf(z) + site.describe(key));
+      if (pickable(z)) z.setAttribute('role', 'radio'); // only once the script is here to answer a tap
+    });
+
+    var paint = function () {
+      var current = null;
+      allZones.filter(pickable).forEach(function (z) {
+        var key = z.getAttribute('data-site');
+        z.setAttribute('data-state', site.zoneState(key, picked));
+        z.classList.toggle('is-next', key === site.NEXT);
+        z.setAttribute('aria-checked', key === picked ? 'true' : 'false');
+        if (key === picked) current = z;
+      });
+      var warn = site.warning(picked);
+      pickLabel.textContent = nameOf(current);
+      pickLabel.classList.toggle('warn', warn !== '');
+      pickWarn.hidden = warn === '';
+      pickWarn.textContent = warn;
+      return warn;
+    };
+
+    var syncs = [];
+    $$('.body-map', picker).forEach(function (svg) {
+      svg.setAttribute('role', 'radiogroup');
+      syncs.push(radioGroup($$('.zone', svg).filter(pickable),
+        function (z) { return z.getAttribute('data-site') === picked; },
+        function (z, byKey) {
+          picked = z.getAttribute('data-site');
+          var warn = paint();
+          syncs.forEach(function (s) { s(); });
+          if (!pickStatus) return;
+          // A key move lands focus on the radio, which announces its name; a tap does not, so say it. Emptied
+          // first, so the same words twice in a row are still announced.
+          var text = (byKey ? '' : nameOf(z) + ' picked. ') + warn;
+          pickStatus.textContent = '';
+          setTimeout(function () { pickStatus.textContent = text; }, 60);
+        }));
+    });
+
+    var toggle = $('.view-toggle', picker);
+    var viewBtns = toggle ? $$('[data-view-btn]', toggle) : [];
+    radioGroup(viewBtns, function (b) { return b.getAttribute('aria-checked') === 'true'; }, function (b) {
+      var v = b.getAttribute('data-view-btn');
+      viewBtns.forEach(function (x) { x.setAttribute('aria-checked', x === b ? 'true' : 'false'); });
+      $$('.body-map', picker).forEach(function (svg) {
+        var on = svg.getAttribute('data-view') === v;
+        // toggleAttribute, not .hidden: an SVG element has no hidden property, so assigning one does nothing.
+        svg.toggleAttribute('hidden', !on);
+        if (on) pickHint.textContent = svg.getAttribute('data-hint');
+      });
+    });
+    if (toggle) toggle.hidden = false; // the back of the body is only reachable with the script, so the switch waits for it
+    paint();
   }
 
   /* ---------- Pause the vial's motion while it is off screen ---------- */
