@@ -1,6 +1,7 @@
 /* Peptidly landing page: the calculator, the Home screen demo, and the motion layer.
    No dependencies, no network, nothing stored. Every part degrades to the static HTML. */
 import { parseDecimal, positive, drawTo, reconstitute } from './calc.js';
+import * as site from './picker.js';
 
 (function () {
   'use strict';
@@ -450,6 +451,8 @@ import { parseDecimal, positive, drawTo, reconstitute } from './calc.js';
     var groups = [
       '.hero-stage',
       '.loop h2, .loop .step, .loop-stage',
+      '.reminders-text > *, .lock',
+      '.sites-text > *, .picker',
       '.cycles h2, .cycles .section-lead, .sheet, .note',
       '.privacy-head > *, .facts-group, .facts-rows > div',
       '.faq h2, .faq details',
@@ -485,6 +488,122 @@ import { parseDecimal, positive, drawTo, reconstitute } from './calc.js';
         revealer.observe(el);
       });
     });
+  }
+
+  /* ---------- Reminders: the timing chips move the lock screen ---------- */
+
+  var lock = $('.lock');
+  if (lock) {
+    var DOSE_AT = 8 * 60; // the example dose is due at 08:00
+    var lockTime = $('[data-lock-time]', lock);
+    var doseNotif = $('[data-notif-dose]', lock);
+    var timingStatus = $('#timing-status');
+    var DAY_NAMES = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+    var MONTH_NAMES = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+    var now = new Date();
+    $('[data-lock-date]', lock).textContent = DAY_NAMES[now.getDay()] + ' ' + now.getDate() + ' ' + MONTH_NAMES[now.getMonth()];
+
+    var clock = function (mins) { return String(Math.floor(mins / 60)).padStart(2, '0') + ':' + String(mins % 60).padStart(2, '0'); };
+    // A notification arrives the way Android shows one: it drops in from above. Once per arrival, 420 ms.
+    var arrive = function (els) {
+      if (reduceMotion.matches) return;
+      els.forEach(function (el, i) {
+        el.classList.remove('arrive');
+        void el.offsetWidth;
+        el.style.setProperty('--notif-delay', (i * 0.14) + 's');
+        el.classList.add('arrive');
+      });
+    };
+    var chips = $$('.t-chip');
+    chips.forEach(function (b) {
+      b.addEventListener('click', function () {
+        chips.forEach(function (x) { x.setAttribute('aria-pressed', x === b ? 'true' : 'false'); });
+        var at = clock(DOSE_AT - Number(b.getAttribute('data-lead')));
+        lockTime.textContent = at;
+        if (timingStatus) timingStatus.textContent = 'The reminder arrives at ' + at + '.';
+        arrive([doseNotif]);
+      });
+    });
+    if ('IntersectionObserver' in window) {
+      new IntersectionObserver(function (entries, obs) {
+        if (!entries[0].isIntersecting) return;
+        arrive($$('.notif', lock).reverse()); // the older alert first, then the reminder on top of it
+        obs.disconnect();
+      }, { threshold: 0.5 }).observe(lock);
+    }
+  }
+
+  /* ---------- Site rotation: the dose screen's body picker ---------- */
+
+  var picker = $('.picker');
+  if (picker) {
+    var picked = site.NEXT; // the app preselects its suggestion
+    var allZones = $$('.zone', picker);
+    var pickLabel = $('[data-pick-label]', picker);
+    var pickWarn = $('[data-pick-warn]', picker);
+    var pickHint = $('[data-pick-hint]', picker);
+    var pickStatus = $('#pick-status');
+    var HINTS = {
+      front: 'Looking down at yourself — your left is on the left.',
+      back: 'Seen from behind — your left is still on the left.'
+    };
+    var nameOf = function (z) { return z.getAttribute('data-name'); };
+
+    allZones.forEach(function (z) {
+      var key = z.getAttribute('data-site');
+      z.setAttribute('data-name', z.getAttribute('aria-label'));
+      z.setAttribute('aria-label', nameOf(z) + site.describe(key));
+      if (site.OFF.indexOf(key) !== -1) {
+        z.setAttribute('data-state', 'off');
+        return;
+      }
+      z.setAttribute('role', 'button'); // only once the script is here to answer a tap
+      z.setAttribute('tabindex', '0');
+    });
+    var zones = allZones.filter(function (z) { return site.OFF.indexOf(z.getAttribute('data-site')) === -1; });
+
+    var paint = function () {
+      var current = null;
+      zones.forEach(function (z) {
+        var key = z.getAttribute('data-site');
+        z.setAttribute('data-state', site.zoneState(key, picked));
+        z.classList.toggle('is-next', key === site.NEXT);
+        z.setAttribute('aria-pressed', key === picked ? 'true' : 'false');
+        if (key === picked) current = z;
+      });
+      var warn = site.warning(picked);
+      pickLabel.textContent = nameOf(current);
+      pickLabel.classList.toggle('warn', warn !== '');
+      pickWarn.hidden = warn === '';
+      pickWarn.textContent = warn;
+      return warn;
+    };
+
+    var pick = function (z) {
+      picked = z.getAttribute('data-site');
+      var warn = paint();
+      if (pickStatus) pickStatus.textContent = nameOf(z) + ' picked.' + (warn ? ' ' + warn : '');
+    };
+    zones.forEach(function (z) {
+      z.addEventListener('click', function () { pick(z); });
+      z.addEventListener('keydown', function (e) {
+        if (e.key !== 'Enter' && e.key !== ' ') return;
+        e.preventDefault();
+        pick(z);
+      });
+    });
+
+    var viewBtns = $$('[data-view-btn]', picker);
+    viewBtns.forEach(function (b) {
+      b.addEventListener('click', function () {
+        var v = b.getAttribute('data-view-btn');
+        viewBtns.forEach(function (x) { x.setAttribute('aria-pressed', x === b ? 'true' : 'false'); });
+        // toggleAttribute, not .hidden: an SVG element has no hidden property, so assigning one does nothing.
+        $$('.body-map', picker).forEach(function (svg) { svg.toggleAttribute('hidden', svg.getAttribute('data-view') !== v); });
+        pickHint.textContent = HINTS[v];
+      });
+    });
+    paint();
   }
 
   /* ---------- Pause the vial's motion while it is off screen ---------- */

@@ -822,7 +822,7 @@ h2 {
   border-radius: 5px;
   background: rgba(169, 184, 204, 0.12);
   color: transparent;
-  text-shadow: 0 0 6px var(--mask-ink, var(--muted));
+  text-shadow: 0 0 6px var(--mask-ink, var(--muted)); /* taste-skill-ignore: the blur that masks a dose, not a shadow */
   font-variant-numeric: tabular-nums;
   line-height: 1.25;
   user-select: none;
@@ -1223,6 +1223,151 @@ h2 {
 }
 .js [data-reveal].in { opacity: 1; transform: none; }
 
+/* ---------- Reminders (a lock screen beside the app's own timing setting) ---------- */
+
+.reminders,
+.sites {
+  display: grid;
+  grid-template-columns: repeat(12, minmax(0, 1fr));
+  column-gap: var(--col-gap);
+  align-items: center;
+  padding-bottom: var(--section);
+}
+.lock-stage { grid-column: 1 / span 6; grid-row: 1; display: flex; justify-content: center; }
+.reminders-text { grid-column: 8 / span 5; grid-row: 1; }
+.facts-list { margin: 32px 0 0; padding: 0; list-style: none; display: grid; gap: 12px; max-width: 34rem; }
+.facts-list li { position: relative; padding-left: 22px; font-size: var(--step-xs); color: var(--muted); line-height: 1.5; }
+.facts-list li::before {
+  content: "";
+  position: absolute;
+  left: 2px;
+  top: 0.55em;
+  width: 8px;
+  height: 8px;
+  border-radius: 999px;
+  background: var(--accent);
+}
+
+[data-ui].lock {
+  position: relative;
+  width: 380px;
+  max-width: 100%;
+  min-height: 540px;
+  padding: 56px 16px 22px;
+  border-radius: 40px;
+  border: 8px solid var(--bg-deep);
+  outline: 1px solid var(--line-hi);
+  background:
+    radial-gradient(120% 70% at 50% 0%, rgba(0, 180, 216, 0.16), transparent 60%), /* taste-skill-ignore: app UI inside [data-ui] */
+    linear-gradient(180deg, #10233A, #0A1626); /* taste-skill-ignore: app UI inside [data-ui] */
+  text-align: center;
+}
+[data-ui] .lock-time {
+  font-size: 64px;
+  font-weight: 300;
+  line-height: 1;
+  letter-spacing: -0.02em;
+  color: var(--ink);
+  font-variant-numeric: tabular-nums;
+}
+[data-ui] .lock-date { margin-top: 8px; font-size: 14px; color: var(--muted); }
+[data-ui] .notifs { margin: 36px 0 0; padding: 0; list-style: none; display: grid; gap: 8px; text-align: left; }
+[data-ui] .notif {
+  padding: 12px 14px 13px;
+  border-radius: 22px;
+  background: rgba(22, 39, 61, 0.92);
+  border: 1px solid var(--line-hi);
+}
+[data-ui] .notif-head { display: flex; align-items: center; gap: 6px; font-size: 12px; color: var(--muted); }
+[data-ui] .notif-head img { width: 18px; height: 18px; border-radius: 5px; }
+[data-ui] .notif-head i { font-style: normal; color: var(--faint); }
+[data-ui] .notif-title { margin-top: 8px; font-size: 14.5px; font-weight: 700; color: var(--ink); }
+[data-ui] .notif-body { margin-top: 2px; font-size: 14px; color: var(--muted); }
+[data-ui] .notif-body .mask { --mask-ink: var(--muted); }
+/* A fresh reminder lands: the card drops in from above, the way Android shows a new notification. */
+.js [data-ui] .notif.arrive { animation: notif-in 420ms var(--ease-out) both; animation-delay: var(--notif-delay, 0s); }
+@keyframes notif-in { from { opacity: 0; transform: translateY(-14px) scale(0.98); } to { opacity: 1; transform: none; } }
+
+.timing { margin-top: 32px; }
+.timing-label { font-size: 13px; font-weight: 600; letter-spacing: 0.04em; color: var(--muted); }
+.timing-chips { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
+[data-ui] .t-chip {
+  min-height: 40px;
+  padding: 0 16px;
+  border-radius: 999px;
+  border: 1px solid var(--line-hi);
+  background: var(--surface);
+  color: var(--muted);
+  font: inherit;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 160ms ease, color 160ms ease, border-color 160ms ease, transform 140ms var(--ease-out);
+}
+[data-ui] .t-chip[aria-pressed="true"] { background: var(--teal-soft); border-color: var(--accent); color: var(--accent-hover); }
+[data-ui] .t-chip:active { transform: scale(0.97); }
+@media (hover: hover) and (pointer: fine) {
+  [data-ui] .t-chip:hover { color: var(--ink); }
+}
+
+/* ---------- Site rotation (the dose screen's body picker) ---------- */
+
+.sites-text { grid-column: 1 / span 5; }
+.picker-stage { grid-column: 7 / span 6; display: flex; flex-direction: column; align-items: center; }
+.picker-stage .stage-caption { width: 400px; max-width: 100%; }
+[data-ui].picker {
+  width: 400px;
+  max-width: 100%;
+  padding: 22px 20px 24px;
+  border-radius: 28px;
+  background: var(--bg);
+  border: 1px solid var(--line-hi);
+  text-align: center;
+}
+[data-ui] .view-toggle { display: flex; justify-content: center; gap: 10px; }
+[data-ui] .v-chip {
+  min-height: 40px;
+  padding: 0 26px;
+  border-radius: 999px;
+  border: 1px solid var(--line-hi);
+  background: transparent;
+  color: var(--muted);
+  font-family: var(--mono); /* taste-skill-ignore: app UI inside [data-ui] */
+  font-size: 13px;
+  letter-spacing: 0.12em;
+  cursor: pointer;
+  transition: background-color 160ms ease, color 160ms ease, border-color 160ms ease;
+}
+[data-ui] .v-chip[aria-pressed="true"] { background: rgba(0, 180, 216, 0.18); border-color: var(--teal-line); color: var(--accent); }
+[data-ui] .map-box { margin: 12px auto 0; max-width: 340px; }
+[data-ui] .body-map { display: block; width: 100%; height: auto; }
+[data-ui] .body-map[hidden] { display: none; }
+[data-ui] .body-map .navel { fill: #0D1B2A; stroke: var(--faint); stroke-width: 1.4; }
+[data-ui] .body-map .side { font-family: var(--mono); font-size: 11px; font-weight: 500; fill: var(--muted); } /* taste-skill-ignore: app UI inside [data-ui] */
+/* Zone states and colours are the app's (BodyMap.tsx ZONE_STYLE, the strict rule). */
+[data-ui] .zone > rect { fill: rgba(255, 255, 255, 0.05); stroke: rgba(255, 255, 255, 0.13); stroke-width: 1; transition: fill 160ms ease, stroke 160ms ease; }
+[data-ui] .zone[data-state="resting"] > rect { fill: rgba(242, 177, 85, 0.16); stroke: rgba(242, 177, 85, 0.5); }
+[data-ui] .zone[data-state="suggested"] > rect { fill: rgba(0, 180, 216, 0.14); stroke: rgba(0, 180, 216, 0.65); }
+[data-ui] .zone[data-state="selected"] > rect { fill: rgba(0, 180, 216, 0.26); stroke: var(--accent); stroke-width: 1.6; }
+[data-ui] .zone[data-state="selWarn"] > rect { fill: rgba(242, 177, 85, 0.24); stroke: var(--amber); stroke-width: 1.6; }
+[data-ui] .zone[data-state="off"] > rect { fill: transparent; stroke: rgba(255, 255, 255, 0.07); stroke-dasharray: 3 3; }
+[data-ui] .zone[data-state="off"] { cursor: default; pointer-events: none; }
+[data-ui] .zone { cursor: pointer; outline: none; }
+[data-ui] .zone:focus-visible > rect { stroke: var(--ink); stroke-width: 2; }
+@media (hover: hover) and (pointer: fine) {
+  /* Not on the picked area: its teal or amber outline is the answer, so hover must not cover it. */
+  [data-ui] .zone:not([data-state="selected"]):not([data-state="selWarn"]):hover > rect { stroke: rgba(255, 255, 255, 0.4); }
+}
+[data-ui] .zone .badge { display: none; pointer-events: none; }
+[data-ui] .zone.is-next .badge { display: inline; }
+[data-ui] .badge rect { fill: #0D2431; stroke: rgba(0, 180, 216, 0.55); stroke-width: 1; }
+[data-ui] .badge text { font-size: 7.5px; font-weight: 700; letter-spacing: 0.8px; fill: var(--accent); }
+[data-ui] .pick-label { margin-top: 10px; font-size: 18px; font-weight: 600; color: var(--accent); }
+[data-ui] .pick-label.warn { color: var(--amber); }
+[data-ui] .pick-warn { margin: 6px auto 0; max-width: 30ch; font-size: 13px; color: var(--amber); }
+[data-ui] .pick-hint { margin-top: 8px; font-size: 13px; color: var(--muted); }
+[data-ui] .pick-steer { margin-top: 14px; font-family: var(--mono); font-size: 12px; color: var(--muted); } /* taste-skill-ignore: app UI inside [data-ui] */
+
 /* ---------- Tablet ---------- */
 
 @media (max-width: 1099px) {
@@ -1234,6 +1379,10 @@ h2 {
   [data-ui].instrument { align-items: center; }
   .loop-text { grid-column: 1 / span 6; }
   .loop-stage { grid-column: 7 / span 6; }
+  .lock-stage { grid-column: 1 / span 6; }
+  .reminders-text { grid-column: 7 / span 6; }
+  .sites-text { grid-column: 1 / span 6; }
+  .picker-stage { grid-column: 7 / span 6; }
   .steps { margin-top: 32px; }
   [data-ui].phone { width: 340px; }
   .plate { display: flex; flex-direction: column; }
@@ -1284,6 +1433,14 @@ h2 {
   .stage-note { margin-left: 0; }
 
   .loop { display: flex; flex-direction: column; align-items: stretch; }
+  .reminders, .sites { display: flex; flex-direction: column; align-items: stretch; }
+  .lock-stage, .picker-stage { margin-top: 40px; }
+  [data-ui] .lock-time { font-size: 56px; }
+  [data-ui].lock { min-height: 0; padding-bottom: 28px; }
+  /* The figure has empty sides, so the map can run to the card's edge: that keeps the abdomen squares at
+     24 px or more on a 320 px screen (WCAG 2.5.8). */
+  [data-ui].picker { padding-inline: 12px; }
+  [data-ui] .map-box { margin-inline: -20px; max-width: none; }
   .loop-text { display: contents; }
   .loop-text h2 { order: 0; }
   .loop-stage { align-items: center; margin: 24px 0 8px; }
