@@ -117,13 +117,15 @@ function bodyToHtml(body) {
 }
 
 /** Render a full HTML page for one legal document. */
-function renderPage(title, body, date) {
+function renderPage(title, body, date, slug, description) {
   return `<!doctype html>
-<html lang="en">
+<html lang="en-GB">
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>${escapeHtml(title)} — Peptidly</title>
+    <meta name="description" content="${escapeHtml(description)}">
+    <link rel="canonical" href="https://peptidly.co.uk/${slug}">
     <link rel="icon" type="image/png" href="/assets/favicon.png">
     <link rel="stylesheet" href="style.css">
   </head>
@@ -152,14 +154,18 @@ ${bodyToHtml(body)}
 
 // ─── Render and write ──────────────────────────────────
 
+// The canonical is the extensionless URL the site links to; /privacy.html serves the same page.
 const pages = [
-  { title: 'Privacy Policy', body: privacyBody, file: 'privacy.html', date: privacyLastUpdated },
-  { title: 'Terms of Service', body: termsBody, file: 'terms.html', date: lastUpdated },
-  { title: 'Health Disclaimer', body: healthBody, file: 'health-disclaimer.html', date: lastUpdated },
+  { title: 'Privacy Policy', body: privacyBody, file: 'privacy.html', date: privacyLastUpdated,
+    description: 'How Peptidly handles your data: what the app collects, where it is stored, who processes it, how long it is kept, and how to export or delete it.' },
+  { title: 'Terms of Service', body: termsBody, file: 'terms.html', date: lastUpdated,
+    description: 'The terms for using Peptidly, a personal peptide cycle tracker for Android: who can use it, your account, acceptable use, purchases and our liability.' },
+  { title: 'Health Disclaimer', body: healthBody, file: 'health-disclaimer.html', date: lastUpdated,
+    description: 'Peptidly is record-keeping, not medical advice. Read the health disclaimer before you use the app: regulatory status, risks and your responsibility.' },
 ];
 
 for (const page of pages) {
-  const html = renderPage(page.title, page.body, page.date);
+  const html = renderPage(page.title, page.body, page.date, page.file.replace(/\.html$/, ''), page.description);
   const outPath = resolve(projectRoot, page.file);
   writeFileSync(outPath, html, 'utf8');
   console.log(`[Build] Wrote ${page.file}`);

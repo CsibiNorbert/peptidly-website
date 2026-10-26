@@ -4,11 +4,12 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Peptidly — Peptide cycle tracker for Android</title>
-    <meta name="description" content="Peptidly is a personal peptide cycle tracker for Android. Plan cycles, log doses in one tap, get exact syringe units from your vial and BAC water, and see when your supply runs low.">
+    <meta name="description" content="A personal peptide cycle tracker for Android. Plan cycles, log doses in one tap, get syringe units from your vial and BAC water, and see when stock runs low.">
     <link rel="canonical" href="https://peptidly.co.uk/">
     <meta name="theme-color" content="#0D1B2A">
     <meta property="og:type" content="website">
     <meta property="og:site_name" content="Peptidly">
+    <meta property="og:locale" content="en_GB">
     <meta property="og:title" content="Peptidly — Peptide cycle tracker for Android">
     <meta property="og:description" content="Plan cycles, log doses in one tap, get exact syringe units from your vial and BAC water, and see when your supply runs low.">
     <meta property="og:url" content="https://peptidly.co.uk/">
@@ -17,6 +18,47 @@
     <meta property="og:image:height" content="630">
     <meta property="og:image:alt" content="Peptidly: peptide cycles, finally organised.">
     <meta name="twitter:card" content="summary_large_image">
+    <!-- Who publishes the site and what the app is, for search engines. No rating: Google does not allow
+         copying the Play rating here. The price is the free start; revisit when a paid option goes live. -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@graph": [
+        {
+          "@type": "Organization",
+          "@id": "https://peptidly.co.uk/#organization",
+          "name": "Peptidly",
+          "url": "https://peptidly.co.uk/",
+          "logo": "https://peptidly.co.uk/logo.png",
+          "email": "hello@peptidly.co.uk"
+        },
+        {
+          "@type": "WebSite",
+          "@id": "https://peptidly.co.uk/#website",
+          "name": "Peptidly",
+          "url": "https://peptidly.co.uk/",
+          "inLanguage": "en-GB",
+          "publisher": { "@id": "https://peptidly.co.uk/#organization" }
+        },
+        {
+          "@type": "MobileApplication",
+          "@id": "https://peptidly.co.uk/#app",
+          "name": "Peptidly",
+          "alternateName": "Peptidly: Peptide Tracker",
+          "description": "A personal peptide cycle tracker for Android. Plan cycles, log doses in one tap, get syringe units from your vial and BAC water, rotate injection sites and see when stock runs low.",
+          "url": "https://peptidly.co.uk/",
+          "sameAs": "https://play.google.com/store/apps/details?id=com.peptidly.app",
+          "installUrl": "https://play.google.com/store/apps/details?id=com.peptidly.app",
+          "image": "https://peptidly.co.uk/assets/og-image.jpg",
+          "operatingSystem": "Android 7.0 or later",
+          "applicationCategory": "LifestyleApplication",
+          "inLanguage": ["en", "es", "ro", "it"],
+          "offers": { "@type": "Offer", "price": "0", "priceCurrency": "GBP" },
+          "publisher": { "@id": "https://peptidly.co.uk/#organization" }
+        }
+      ]
+    }
+    </script>
     <link rel="icon" type="image/png" href="/assets/favicon.png">
     <link rel="preload" href="/assets/fonts/inter-latin-wght.woff2" as="font" type="font/woff2" crossorigin>
     <link rel="stylesheet" href="/home.css">
