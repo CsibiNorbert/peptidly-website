@@ -59,7 +59,11 @@ expect(html.includes(`<p class="pick-steer">${skippedLine}</p>`), `skipped line:
 // Zone states and the warning, picked = each pickable area in turn, against the app's zoneState and rollup.
 // The hint under the map, before the script runs, is the app's.
 expect(html.includes(`<p class="pick-hint" data-pick-hint>${en.injectionSites.bodyHintFront}</p>`), `hint: the app says "${en.injectionSites.bodyHintFront}"`);
-expect(html.includes(`data-view="back"`) && html.includes(`data-hint="${en.injectionSites.bodyHintBack}"`), `back hint: the app says "${en.injectionSites.bodyHintBack}"`);
+const attr = (t) => t.replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;');
+for (const [v, hint] of [['front', en.injectionSites.bodyHintFront], ['back', en.injectionSites.bodyHintBack]]) {
+  const svg = html.match(new RegExp(`<svg class="body-map" data-view="${v}"[^>]*>`));
+  expect(svg && svg[0].includes(`data-hint="${attr(hint)}"`), `${v} map hint: the app says "${hint}"`);
+}
 const keys = [...html.matchAll(/class="zone[^"]*" data-site="([a-z_]+)"/g)].map((m) => m[1]);
 expect(keys.length === 14, `expected 14 areas in the body map, found ${keys.length}`);
 // The map baked into index.html (scripts/build-body-map.mjs) must start where the script would.

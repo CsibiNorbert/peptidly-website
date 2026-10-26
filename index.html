@@ -277,9 +277,9 @@
           <h2 id="reminders-title">Reminders that know what is due.</h2>
           <p class="section-lead">Every scheduled dose gets a reminder, at its time or up to 30 minutes before.</p>
           <div class="timing" data-ui hidden>
-            <p class="timing-try">Pick a timing to see when this one arrives for an 08:00 dose.</p>
+            <p class="timing-try" id="timing-try">Pick a timing to see when this one arrives for an 08:00 dose.</p>
             <p class="timing-label" id="timing-label">Reminder timing</p>
-            <div class="timing-chips" role="radiogroup" aria-labelledby="timing-label">
+            <div class="timing-chips" role="radiogroup" aria-labelledby="timing-label" aria-describedby="timing-try">
               <button type="button" class="t-chip" role="radio" data-lead="0" aria-checked="false" tabindex="-1">At dose time</button>
               <button type="button" class="t-chip" role="radio" data-lead="5" aria-checked="false" tabindex="-1">5 min before</button>
               <button type="button" class="t-chip" role="radio" data-lead="10" aria-checked="false" tabindex="-1">10 min</button>

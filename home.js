@@ -498,21 +498,21 @@ import * as site from './picker.js';
       var any = items.some(isChecked);
       items.forEach(function (el, i) { el.setAttribute('tabindex', isChecked(el) || (!any && i === 0) ? '0' : '-1'); });
     };
-    var take = function (el) { choose(el); sync(); };
+    var take = function (el, byKey) { choose(el, byKey); sync(); };
     items.forEach(function (el, i) {
-      el.addEventListener('click', function () { take(el); });
+      el.addEventListener('click', function () { take(el, false); });
       el.addEventListener('keydown', function (e) {
         if (e.altKey || e.ctrlKey || e.metaKey) return; // leave browser shortcuts (Alt+Left is Back) alone
         var step = e.key === 'ArrowRight' || e.key === 'ArrowDown' ? 1 : e.key === 'ArrowLeft' || e.key === 'ArrowUp' ? -1 : 0;
         if (step) {
           e.preventDefault();
           var next = items[(i + step + items.length) % items.length];
-          take(next);
+          take(next, true);
           next.focus();
         } else if ((e.key === ' ' || e.key === 'Enter') && el.tagName !== 'BUTTON') {
           // a <button> turns these into a click by itself
           e.preventDefault();
-          take(el);
+          take(el, true);
         }
       });
     });
@@ -559,7 +559,8 @@ import * as site from './picker.js';
       show(b);
       arrive([doseNotif]);
     });
-    show(chips.filter(checked)[0]); // the clock and the status line come from the checked choice, not the HTML
+    var first = chips.filter(checked)[0] || chips[0];
+    if (first) show(first); // the clock and the status line come from the checked choice, not the HTML
     timing.hidden = false; // the choice only works with the script, so it only shows with it
     // The cards drop in as the lock screen starts to rise into view (the same moment as its entrance), so
     // they are never seen first and then replayed.
@@ -614,12 +615,16 @@ import * as site from './picker.js';
       svg.setAttribute('role', 'radiogroup');
       syncs.push(radioGroup($$('.zone', svg).filter(pickable),
         function (z) { return z.getAttribute('data-site') === picked; },
-        function (z) {
+        function (z, byKey) {
           picked = z.getAttribute('data-site');
           var warn = paint();
           syncs.forEach(function (s) { s(); });
-          // The radio announces its own name; only the warning needs saying.
-          if (pickStatus) pickStatus.textContent = warn;
+          if (!pickStatus) return;
+          // A key move lands focus on the radio, which announces its name; a tap does not, so say it. Emptied
+          // first, so the same words twice in a row are still announced.
+          var text = (byKey ? '' : nameOf(z) + ' picked. ') + warn;
+          pickStatus.textContent = '';
+          setTimeout(function () { pickStatus.textContent = text; }, 60);
         }));
     });
 
