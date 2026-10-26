@@ -157,14 +157,14 @@
         </div>
       </section>
 
-      <!-- The daily loop: one pinned Home screen changes state as three statements pass. -->
+      <!-- The daily loop: three statement buttons switch one Home screen; its row Log buttons work too. -->
       <section class="loop wrap" id="how-it-works" aria-labelledby="loop-title">
         <div class="loop-text">
           <h2 id="loop-title">What you log comes off your stock.</h2>
           <ol class="steps">
             <li class="step is-active" data-step="1">
               <h3><button class="step-btn" type="button" aria-pressed="true" aria-controls="home-demo">Log the dose in one tap.</button></h3>
-              <p>The next dose waits at the top of Home. Tap Log and the time, the amount and, for an injection, the site are recorded.</p>
+              <p>Today's doses are listed on Home. Tap Log on one and the time, the amount and, for an injection, the site are recorded.</p>
             </li>
             <li class="step" data-step="2">
               <h3><button class="step-btn" type="button" aria-pressed="false" aria-controls="home-demo">Then the vial keeps count.</button></h3>
@@ -219,7 +219,7 @@
                   <p class="next-title" data-next-title>AM blend · 250 mcg</p>
                   <p class="next-when" data-next-when>in 12m · 08:00</p>
                 </div>
-                <button class="next-log" type="button" data-log aria-label="Log the next dose">Log</button>
+                <span class="next-log" aria-hidden="true">Log</span>
               </div>
 
               <div class="today-head">

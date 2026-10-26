@@ -241,7 +241,8 @@ import { parseDecimal, positive, drawTo, reconstitute } from './calc.js';
   }
 
   function pulseLog() {
-    var b = $('.next-log', phone);
+    var b = $$('.row-log', phone).filter(isShown)[0];
+    if (!b) return;
     b.classList.remove('pulse');
     void b.offsetWidth;
     b.classList.add('pulse');
@@ -283,7 +284,15 @@ import { parseDecimal, positive, drawTo, reconstitute } from './calc.js';
   // Each statement is a button that puts the Home screen in its state.
   if (phone) {
     $$('.step').forEach(function (s) {
-      $('.step-btn', s).addEventListener('click', function () { setState(Number(s.getAttribute('data-step'))); });
+      $('.step-btn', s).addEventListener('click', function () {
+        var n = Number(s.getAttribute('data-step'));
+        setState(n);
+        var changed = n === 3 ? $('.nudge', phone) : $('.dose-row', phone);
+        var r = changed.getBoundingClientRect();
+        if (r.top < 0 || r.top > window.innerHeight - 80) {
+          changed.scrollIntoView({ block: 'nearest', behavior: reduceMotion.matches ? 'auto' : 'smooth' });
+        }
+      });
     });
   }
 

@@ -532,6 +532,16 @@ h2 {
 }
 .step p { margin-top: 10px; font-size: var(--step-s); color: var(--muted); transition: color 200ms ease; }
 .step.is-active { background: var(--surface); }
+.step.is-active::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 18px;
+  bottom: 18px;
+  width: 4px;
+  border-radius: 4px;
+  background: var(--accent);
+}
 .step.is-active h3,
 .step.is-active p,
 .step:hover h3 { color: var(--ink); }
@@ -711,12 +721,10 @@ h2 {
   background: var(--accent);
   color: var(--on-accent);
   font-weight: 700;
-  cursor: pointer;
-  transition: transform 140ms var(--ease-out), background-color 160ms ease;
+  display: inline-flex;
+  align-items: center;
 }
-[data-ui] .next-log:hover { background: var(--accent-hover); }
-[data-ui] .next-log:active { transform: scale(0.95); }
-[data-ui].phone[data-state="1"] .next-log.pulse { animation: nudge-ring 2.4s ease-out 2; }
+[data-ui].phone[data-state="1"] .row-log.pulse { animation: nudge-ring 2.4s ease-out 2; }
 @keyframes nudge-ring {
   0% { box-shadow: 0 0 0 0 rgba(0, 180, 216, 0.55); } /* taste-skill-ignore: app UI inside [data-ui] */
   70% { box-shadow: 0 0 0 12px rgba(0, 180, 216, 0); } /* taste-skill-ignore: app UI inside [data-ui] */
@@ -1216,8 +1224,8 @@ h2 {
   .loop { display: flex; flex-direction: column; align-items: stretch; }
   .loop-text { display: contents; }
   .loop-text h2 { order: 0; }
-  .loop-stage { order: 1; justify-content: center; margin: 32px 0 8px; }
-  .steps { order: 2; margin-top: 16px; }
+  .loop-stage { justify-content: center; margin: 24px 0 8px; }
+  .steps { margin-top: 24px; }
   [data-ui].phone { width: 100%; max-width: 372px; }
   .step { padding: 18px 20px; }
   [data-ui] .next-icon { width: 40px; height: 40px; }
