@@ -19,6 +19,11 @@ import { parseDecimal, positive, drawTo, reconstitute } from './calc.js';
   var liquid = vial && $('.liquid', vial);
   var ripple = vial && $('.ripple', vial);
   var vialLabel = vial && $('.vial-label', vial);
+  var waves = vial ? $$('.wave', vial) : [];
+  var bubbles = vial ? $$('.bubbles circle', vial) : [];
+  var motionBtn = $('.vial-motion');
+  var level = 0; // the level the liquid is heading for, in %
+  var phase = 0;
 
   // While mixing, the level shows the water in a 3 ml vial, so the colour stays teal:
   // the app's colour bands describe what is left, and a freshly mixed vial has not been drawn from.
@@ -27,17 +32,67 @@ import { parseDecimal, positive, drawTo, reconstitute } from './calc.js';
     var p = Math.max(0, Math.min(100, pct));
     // Body top 42, height 254; the fill uses (254 - 8) of it, as vial.jsx does.
     liquid.style.transform = 'translateY(' + (292 - 2.46 * p).toFixed(1) + 'px)';
-    $('.bubbles', vial).style.display = p > 15 ? '' : 'none';
+    level = p;
+    if (!running) drawLiquid();
+    vial.classList.toggle('is-moving', running && level > 15);
   }
 
-  // Motion that starts on its own stops within five seconds (WCAG 2.2.2): the liquid settles 5 s after the last change.
-  var restTimer = 0;
-  function wake() {
-    if (!vial) return;
-    vial.classList.remove('is-resting');
-    clearTimeout(restTimer);
-    restTimer = setTimeout(function () { vial.classList.add('is-resting'); }, 5000);
+  // The surface and bubbles move as the app's do (vial.jsx): two sines, the phase gaining 0.04 a frame at
+  // 60 Hz, so 2.4 a second here at any refresh rate. Coordinates are the liquid group's, 0 at the surface.
+  function surface(ph) {
+    var amp = Math.min(3, level / 20);
+    var d = '';
+    for (var x = 4; x <= 116; x += 3) {
+      var y = Math.sin(x * 0.08 + ph) * amp + Math.sin(x * 0.18 + ph * 1.3) * amp * 0.4;
+      d += (d ? 'L' : 'M') + x + ' ' + y.toFixed(2);
+    }
+    return d + 'L116 270H4Z';
   }
+  function drawLiquid() {
+    if (waves.length < 2) return;
+    waves[0].setAttribute('d', surface(phase));
+    waves[1].setAttribute('d', surface(phase + 1.8));
+    var span = Math.max(1, level * 2.46 - 20);
+    bubbles.forEach(function (b, i) {
+      b.setAttribute('cx', (10 + ((phase * 10 + i * 23) % 104)).toFixed(1));
+      b.setAttribute('cy', (12 + ((phase * 20 + i * 40) % span)).toFixed(1));
+    });
+  }
+
+  // It moves for as long as it is on screen, like the app's. WCAG 2.2.2 asks for a way to stop motion that
+  // lasts over five seconds: that is the button under the vial. Reduced motion: no movement at all.
+  var running = false;
+  var userPaused = false;
+  var onScreen = true;
+  var raf = 0;
+  var lastT = 0;
+  function frame(t) {
+    phase += lastT ? 2.4 * Math.min(0.05, (t - lastT) / 1000) : 0;
+    lastT = t;
+    drawLiquid();
+    raf = requestAnimationFrame(frame);
+  }
+  function updateMotion() {
+    if (!vial) return;
+    var on = !reduceMotion.matches && !userPaused && onScreen;
+    if (motionBtn) motionBtn.hidden = reduceMotion.matches;
+    if (on !== running) {
+      running = on;
+      cancelAnimationFrame(raf);
+      lastT = 0;
+      if (on) raf = requestAnimationFrame(frame);
+    }
+    vial.classList.toggle('is-moving', running && level > 15);
+  }
+  if (motionBtn) {
+    motionBtn.addEventListener('click', function () {
+      userPaused = !userPaused;
+      motionBtn.classList.toggle('is-paused', userPaused);
+      motionBtn.setAttribute('aria-label', userPaused ? 'Play the vial animation' : 'Pause the vial animation');
+      updateMotion();
+    });
+  }
+  if (reduceMotion.addEventListener) reduceMotion.addEventListener('change', updateMotion);
 
   function rippleVial() {
     if (!ripple || reduceMotion.matches) return;
@@ -89,7 +144,6 @@ import { parseDecimal, positive, drawTo, reconstitute } from './calc.js';
     setVialLevel(positive(w) ? (w / 3) * 100 : 0);
     inDose.parentNode.classList.toggle('wants', !positive(d));
 
-    wake();
     var r = reconstitute(v, w, d);
     out.conc.textContent = r.conc === null ? '—' : r.conc.toFixed(2);
     out.doses.textContent = r.dosesPerVial === null ? '—' : String(r.dosesPerVial);
@@ -132,6 +186,7 @@ import { parseDecimal, positive, drawTo, reconstitute } from './calc.js';
       el.addEventListener('input', calculate);
     });
     calculate();
+    updateMotion();
     // The app fills a vial in on mount; start empty, then fill on the next frames.
     if (liquid && !reduceMotion.matches) {
       var target = liquid.style.transform;
@@ -398,7 +453,8 @@ import { parseDecimal, positive, drawTo, reconstitute } from './calc.js';
 
   if (vial && 'IntersectionObserver' in window) {
     new IntersectionObserver(function (entries) {
-      vial.classList.toggle('is-paused', !entries[0].isIntersecting);
+      onScreen = entries[0].isIntersecting;
+      updateMotion();
     }).observe(vial);
   }
 })();
