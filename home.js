@@ -33,14 +33,15 @@ import { parseDecimal, positive, drawTo, reconstitute } from './calc.js';
     // Body top 42, height 254; the fill uses (254 - 8) of it, as vial.jsx does.
     liquid.style.transform = 'translateY(' + (292 - 2.46 * p).toFixed(1) + 'px)';
     level = p;
-    if (!running) drawLiquid();
-    vial.classList.toggle('is-moving', running && level > 15);
+    updateMotion();
+    if (!running) drawLiquid(); // a still surface still takes the new level's amplitude
   }
 
   // The surface and bubbles move as the app's do (vial.jsx): two sines, the phase gaining 0.04 a frame at
   // 60 Hz, so 2.4 a second here at any refresh rate. Coordinates are the liquid group's, 0 at the surface.
-  // The maths runs in the app's own units for its default 84-wide vial (the app draws it 80-100 wide), scaled up by S to
-  // this 120-wide one, so the waves keep the app's proportions instead of shrinking to 2.5 % of the width.
+  // The maths runs in the app's own units for its default 84-wide vial (other screens draw it 50 to 100 wide),
+  // scaled up by S to this 120-wide one, so the waves keep that vial's proportions instead of shrinking to
+  // 2.5 % of the width. Bubble sizes and speeds scale the same way; they wrap across this vial's body.
   var S = 120 / 84;
   function surface(ph) {
     var amp = Math.min(3, level / 20);
@@ -78,7 +79,8 @@ import { parseDecimal, positive, drawTo, reconstitute } from './calc.js';
   }
   function updateMotion() {
     if (!vial) return;
-    var on = !reduceMotion.matches && !userPaused && onScreen;
+    // An empty vial has a flat surface and no bubbles, so there is nothing to redraw.
+    var on = !reduceMotion.matches && !userPaused && onScreen && level > 0;
     if (motionBtn) motionBtn.hidden = reduceMotion.matches;
     if (on !== running) {
       running = on;
@@ -92,11 +94,12 @@ import { parseDecimal, positive, drawTo, reconstitute } from './calc.js';
     motionBtn.addEventListener('click', function () {
       userPaused = !userPaused;
       motionBtn.classList.toggle('is-paused', userPaused);
-      motionBtn.setAttribute('aria-label', userPaused ? 'Play the vial animation' : 'Pause the vial animation');
+      motionBtn.setAttribute('aria-pressed', String(userPaused));
       updateMotion();
     });
   }
   if (reduceMotion.addEventListener) reduceMotion.addEventListener('change', updateMotion);
+  else if (reduceMotion.addListener) reduceMotion.addListener(updateMotion); // Safari before 14
 
   function rippleVial() {
     if (!ripple || reduceMotion.matches) return;

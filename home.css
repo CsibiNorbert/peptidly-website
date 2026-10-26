@@ -308,6 +308,7 @@ a:hover { color: var(--accent-hover); }
   transition: color 160ms ease, border-color 160ms ease;
 }
 [data-ui] .vial-motion[hidden] { display: none; }
+@media (max-width: 699px) { [data-ui] .vial-motion { width: 44px; height: 44px; } }
 [data-ui] .vial-motion svg { fill: currentColor; }
 [data-ui] .vial-motion .i-play,
 [data-ui] .vial-motion.is-paused .i-pause { display: none; }
