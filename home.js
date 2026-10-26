@@ -35,7 +35,7 @@ import * as site from './picker.js';
   function setVialLevel(pct) {
     if (!vial) return;
     var p = Math.max(0, Math.min(100, pct));
-    // Body top 42, height 254; the fill uses (254 - 8) of it, as vial.jsx does.
+    // Body top 42, height 254; the fill uses (254 - 8) of it, as the app's vial does.
     var tf = 'translateY(' + (292 - 2.46 * p).toFixed(1) + 'px)';
     movingUntil = performance.now() + 950;
     if (firstFill === false) liquid.style.transform = tf;
@@ -51,7 +51,7 @@ import * as site from './picker.js';
     if (!running) drawLiquid(); // a still surface still takes the new level's amplitude
   }
 
-  // The surface and bubbles move as the app's do (vial.jsx): two sines, the phase gaining 0.04 a frame at
+  // The surface and bubbles move as the app's do: two sines, the phase gaining 0.04 a frame at
   // 60 Hz, so 2.4 a second here at any refresh rate. Coordinates are the liquid group's, 0 at the surface.
   // The maths runs in the app's own units for its default 84-wide vial (other screens draw it 50 to 100 wide),
   // scaled up by S to this 120-wide one, so the waves keep that vial's proportions instead of shrinking to
@@ -289,7 +289,7 @@ import * as site from './picker.js';
     var h = (pct / 100) * 40; // VialMini: fill = pct of (height - 14)
     rect.setAttribute('y', String(52 - h));
     rect.setAttribute('height', String(h));
-    // vial.jsx bands: teal above 50 %, lavender above 20 %. No row here goes below 30 %.
+    // The app's vial bands: teal above 50 %, lavender above 20 %. No row here goes below 30 %.
     svg.classList.toggle('lav', pct <= 50);
   }
 

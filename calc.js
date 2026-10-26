@@ -1,8 +1,5 @@
 // Reconstitution arithmetic for the landing page, ported from the Peptidly app so the site computes what
-// the app computes:
-//   parseDecimal  <- helix/lib/parseDecimal.ts
-//   reconstitute  <- helix/services/reconstitution.ts, plus the calculator screen's doses-per-vial
-//   drawTo        <- formatDrawToUnits in helix/lib/dose/doseDisplay.ts
+// the app computes: parseDecimal, reconstitute (plus the calculator screen's doses-per-vial) and drawTo.
 // scripts/check-calculator.mjs runs these against the app's own functions; run it after any change here.
 
 // A comma or a dot may be the decimal separator; with both, the last one is.
