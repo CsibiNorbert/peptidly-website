@@ -101,6 +101,28 @@ import { parseDecimal, positive, drawTo, reconstitute } from './calc.js';
   if (reduceMotion.addEventListener) reduceMotion.addEventListener('change', updateMotion);
   else if (reduceMotion.addListener) reduceMotion.addListener(updateMotion); // Safari before 14
 
+  // One burst of the green "you can press this" ring on each element, 0.5 s apart, at most three bursts
+  // per element per visit. The class comes off when the burst ends, so nothing replays it by accident (a
+  // button shown again, a field that wants a dose again), and a burst already running is left alone.
+  // Reduced motion: no ring (the dose field's teal border and the Log tag stay).
+  function pulse(els) {
+    if (reduceMotion.matches) return;
+    els = els.filter(function (el) {
+      var n = Number(el.getAttribute('data-pulses') || 0);
+      return !el.classList.contains('pulse') && n < 3;
+    });
+    els.forEach(function (el, i) {
+      el.setAttribute('data-pulses', String(Number(el.getAttribute('data-pulses') || 0) + 1));
+      el.style.setProperty('--pulse-delay', (i * 0.5) + 's');
+      el.classList.add('pulse');
+      // Backstop for a ring that never ran or never reported its end (a browser without animationcancel).
+      setTimeout(function () { el.classList.remove('pulse'); }, (i * 0.5 + 4.5) * 1000);
+    });
+  }
+  function endPulse(e) { if (e.animationName === 'tap-ring') e.target.classList.remove('pulse'); }
+  document.addEventListener('animationend', endPulse);
+  document.addEventListener('animationcancel', endPulse);
+
   function rippleVial() {
     if (!ripple || reduceMotion.matches) return;
     ripple.classList.remove('go');
@@ -194,6 +216,13 @@ import { parseDecimal, positive, drawTo, reconstitute } from './calc.js';
     });
     calculate();
     updateMotion();
+    // The empty dose field rings each time the calculator comes into view, until a dose is typed.
+    if ('IntersectionObserver' in window) {
+      new IntersectionObserver(function (entries) {
+        var box = inDose.parentNode;
+        if (entries[0].isIntersecting && box.classList.contains('wants')) pulse([box]);
+      }, { threshold: 0.6 }).observe(inDose);
+    }
     // The app fills a vial in on mount; start empty, then fill on the next frames.
     if (liquid && !reduceMotion.matches) {
       var target = liquid.style.transform;
@@ -262,6 +291,7 @@ import { parseDecimal, positive, drawTo, reconstitute } from './calc.js';
     var next = taken.indexOf(false);
     var card = $('.next-card', phone);
     card.classList.toggle('all-done', next === -1);
+    rows.forEach(function (row, i) { row.classList.toggle('is-next', i === next); });
     var shown = DATA[next === -1 ? DATA.length - 1 : next];
     $('[data-next-name]', phone).textContent = shown.name;
     $('[data-next-when]', phone).textContent = shown.when;
@@ -285,6 +315,7 @@ import { parseDecimal, positive, drawTo, reconstitute } from './calc.js';
   function logRow(i) {
     if (i < 0 || takenState[i]) return;
     takenState[i] = true;
+    phone.classList.add('tried'); // the hint has done its job: no more tag, no more pulses
     render(takenState);
     var count = takenState.filter(Boolean).length;
     say(DATA[i].name + ' logged. ' + count + ' of ' + DATA.length + ' doses taken today.');
@@ -303,22 +334,21 @@ import { parseDecimal, positive, drawTo, reconstitute } from './calc.js';
     }
   }
 
+  // Every Log the visitor can press rings, one after the other, until they have pressed one.
   function pulseLog() {
-    var b = $$('.row-log', phone).filter(isShown)[0];
-    if (!b) return;
-    b.classList.remove('pulse');
-    void b.offsetWidth;
-    b.classList.add('pulse');
+    if (phone.classList.contains('tried')) return;
+    pulse($$('.row-log', phone).filter(isShown));
   }
 
   function setState(n) {
     if (!phone) return;
     var was = phone.getAttribute('data-state');
     phone.setAttribute('data-state', String(n));
-    if (n === 1 && was !== '1') pulseLog();
     clearTimeout(resetTimer);
     takenState = [n >= 2, false];
     render(takenState);
+    // Steps 1 and 2 are about pressing Log; step 3 is about the banner, so nothing else moves then.
+    if (String(n) !== was && n !== 3) pulseLog();
     $('.nudge', phone).setAttribute('aria-hidden', n === 3 ? 'false' : 'true');
     keepFocus();
     $$('.step').forEach(function (s) {
@@ -336,10 +366,10 @@ import { parseDecimal, positive, drawTo, reconstitute } from './calc.js';
       });
     });
     setState(1);
-    // The Log pulse runs when the screen is first seen, not at load while it is still below the fold.
+    // The Log pulse runs each time the screen comes into view, not at load while it is below the fold.
     if ('IntersectionObserver' in window) {
-      new IntersectionObserver(function (entries, obs) {
-        if (entries[0].isIntersecting) { pulseLog(); obs.disconnect(); }
+      new IntersectionObserver(function (entries) {
+        if (entries[0].isIntersecting) pulseLog();
       }, { threshold: 0.5 }).observe(phone);
     }
   }
