@@ -5,3 +5,9 @@ Thumbs.db
 .vscode/
 .idea/
 .taste-skill/
+
+# Design context for the impeccable skill, kept out of git: GitHub Pages serves every committed file raw
+# (README.md answers 200), and PRODUCT.md records unannounced plans. Copies live in the Obsidian vault.
+.impeccable/
+PRODUCT.md
+DESIGN.md

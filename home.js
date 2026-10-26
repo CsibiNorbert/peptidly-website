@@ -24,6 +24,10 @@ import * as site from './picker.js';
   var bubbles = vial ? $$('.bubbles circle', vial) : [];
   var motionBtn = $('.vial-motion');
   var level = 0; // the level the liquid is heading for, in %
+  // The first level waits two frames, so the CSS entry (@starting-style) styles the liquid before an inline
+  // transform exists: an inline value present at the first style resolution would win and skip the fill-in.
+  var firstFill = null; // null: no level yet; a string: the first level, waiting; false: written
+  var movingUntil = 0; // the level transition (900 ms) can be running until about this time
   var phase = 0;
 
   // While mixing, the level shows the water in a 3 ml vial, so the colour stays teal:
@@ -32,7 +36,16 @@ import * as site from './picker.js';
     if (!vial) return;
     var p = Math.max(0, Math.min(100, pct));
     // Body top 42, height 254; the fill uses (254 - 8) of it, as vial.jsx does.
-    liquid.style.transform = 'translateY(' + (292 - 2.46 * p).toFixed(1) + 'px)';
+    var tf = 'translateY(' + (292 - 2.46 * p).toFixed(1) + 'px)';
+    movingUntil = performance.now() + 950;
+    if (firstFill === false) liquid.style.transform = tf;
+    else if (firstFill) firstFill = tf;
+    else {
+      firstFill = tf;
+      requestAnimationFrame(function () {
+        requestAnimationFrame(function () { liquid.style.transform = firstFill; firstFill = false; });
+      });
+    }
     level = p;
     updateMotion();
     if (!running) drawLiquid(); // a still surface still takes the new level's amplitude
@@ -44,8 +57,16 @@ import * as site from './picker.js';
   // scaled up by S to this 120-wide one, so the waves keep that vial's proportions instead of shrinking to
   // 2.5 % of the width. Bubble sizes and speeds scale the same way; they wrap across this vial's body.
   var S = 120 / 84;
-  function surface(ph) {
-    var amp = Math.min(3, level / 20);
+  // While the level is moving, read where it is now from the transition, not where it is heading.
+  function shownLevel() {
+    if (!running || performance.now() > movingUntil) return level;
+    var t = getComputedStyle(liquid).transform;
+    if (!t || t === 'none') return level;
+    var ty = new DOMMatrixReadOnly(t).m42;
+    return Math.max(0, Math.min(100, (292 - ty) / 2.46));
+  }
+  function surface(ph, shown) {
+    var amp = Math.min(3, shown / 20);
     var d = '';
     for (var x = 4; x <= 116; x += 3) {
       var xa = x / S;
@@ -56,9 +77,10 @@ import * as site from './picker.js';
   }
   function drawLiquid() {
     if (waves.length < 2) return;
-    waves[0].setAttribute('d', surface(phase));
-    waves[1].setAttribute('d', surface(phase + 1.8));
-    var span = Math.max(1, level * 2.46 - 20);
+    var shown = shownLevel();
+    waves[0].setAttribute('d', surface(phase, shown));
+    waves[1].setAttribute('d', surface(phase + 1.8, shown));
+    var span = Math.max(1, shown * 2.46 - 20);
     bubbles.forEach(function (b, i) {
       b.setAttribute('cx', (10 + (((phase * 10 + i * 23) * S) % 104)).toFixed(1));
       b.setAttribute('cy', (12 + (((phase * 20 + i * 40) * S) % span)).toFixed(1));
@@ -145,6 +167,7 @@ import * as site from './picker.js';
     doses: $('#r-doses')
   };
   var ticks = $$('.syr-ticks [data-tick]');
+  var drawCard = $('.draw');
   var lastDose = '';
   var rippleTimer = 0;
 
@@ -177,6 +200,7 @@ import * as site from './picker.js';
     var r = reconstitute(v, w, d);
     out.conc.textContent = r.conc === null ? '—' : r.conc.toFixed(2);
     out.doses.textContent = r.dosesPerVial === null ? '—' : String(r.dosesPerVial);
+    out.doses.closest('.readout > div').classList.toggle('is-empty', r.dosesPerVial === null);
 
     if (r.units !== null) {
       var units = r.units;
@@ -186,6 +210,7 @@ import * as site from './picker.js';
       out.ml.textContent = r.volume.toFixed(3);
       out.pct.textContent = drawTo(Math.min(100, units)) + '%';
       out.fill.style.width = Math.min(100, units) + '%';
+      if (drawCard) drawCard.classList.remove('is-waiting');
       out.fill.classList.remove('empty');
       ticks.forEach(function (t) {
         var p = Number(t.getAttribute('data-tick'));
@@ -197,6 +222,7 @@ import * as site from './picker.js';
       out.ml.textContent = '—';
       out.pct.textContent = '—';
       out.fill.style.width = '0%';
+      if (drawCard) drawCard.classList.add('is-waiting');
       out.fill.classList.add('empty');
       ticks.forEach(function (t) { t.classList.remove('on'); });
     }
@@ -223,18 +249,6 @@ import * as site from './picker.js';
         var box = inDose.parentNode;
         if (entries[0].isIntersecting && box.classList.contains('wants')) pulse([box]);
       }, { threshold: 0.6 }).observe(inDose);
-    }
-    // The app fills a vial in on mount; start empty, then fill on the next frames.
-    if (liquid && !reduceMotion.matches) {
-      var target = liquid.style.transform;
-      liquid.style.transition = 'none';
-      liquid.style.transform = 'translateY(292px)';
-      requestAnimationFrame(function () {
-        requestAnimationFrame(function () {
-          liquid.style.transition = '';
-          liquid.style.transform = target;
-        });
-      });
     }
   }
 
@@ -449,20 +463,20 @@ import * as site from './picker.js';
 
   if ('IntersectionObserver' in window && !reduceMotion.matches) {
     var groups = [
-      '.hero-stage',
       '.loop h2, .loop .step, .loop-stage',
       '.reminders-text > *, .lock, .reminders-facts',
       '.sites-text > *, .picker',
       '.cycles h2, .cycles .section-lead, .sheet, .note',
       '.privacy-head > *, .facts-group, .facts-rows > div',
       '.faq h2, .faq details',
-      '.cta-copy > *, .welcome',
-      '.tile'
+      '.cta-copy > *, .welcome'
     ];
     var revealer = new IntersectionObserver(function (entries) {
+      var k = 0;
       entries.forEach(function (e) {
         if (!e.isIntersecting) return;
         var el = e.target;
+        el.style.setProperty('--i', String(Math.min(k++, 6)));
         el.classList.add('in');
         revealer.unobserve(el);
         // Once it has arrived, drop the entrance styles so the element's own hover, press and colour
@@ -473,7 +487,7 @@ import * as site from './picker.js';
           el.style.removeProperty('--i');
         }, 1300);
       });
-    }, { threshold: 0 });
+    }, { threshold: 0, rootMargin: '0px 0px -64px 0px' });
     document.addEventListener('focusin', function (e) {
       var hidden = e.target.closest && e.target.closest('[data-reveal]');
       if (!hidden) return;
@@ -482,9 +496,8 @@ import * as site from './picker.js';
       hidden.style.removeProperty('--i');
     });
     groups.forEach(function (sel) {
-      $$(sel).forEach(function (el, i) {
+      $$(sel).forEach(function (el) {
         el.setAttribute('data-reveal', '');
-        el.style.setProperty('--i', String(Math.min(i, 6)));
         revealer.observe(el);
       });
     });
@@ -498,9 +511,11 @@ import * as site from './picker.js';
       var any = items.some(isChecked);
       items.forEach(function (el, i) { el.setAttribute('tabindex', isChecked(el) || (!any && i === 0) ? '0' : '-1'); });
     };
-    var take = function (el, byKey) { choose(el, byKey); sync(); };
+    // quiet: a click with detail 0 (Enter or Space on a button, or assistive tech) plays no motion; what is
+    // announced still follows byKey, so a screen reader's click is still named.
+    var take = function (el, byKey, quiet) { choose(el, byKey, quiet); sync(); };
     items.forEach(function (el, i) {
-      el.addEventListener('click', function () { take(el, false); });
+      el.addEventListener('click', function (e) { take(el, false, e.detail === 0); });
       el.addEventListener('keydown', function (e) {
         if (e.altKey || e.ctrlKey || e.metaKey) return; // leave browser shortcuts (Alt+Left is Back) alone
         var step = e.key === 'ArrowRight' || e.key === 'ArrowDown' ? 1 : e.key === 'ArrowLeft' || e.key === 'ArrowUp' ? -1 : 0;
@@ -553,23 +568,32 @@ import * as site from './picker.js';
       if (timingStatus) timingStatus.textContent = 'The reminder arrives at ' + at + (lead ? ', ' + lead + ' minutes before the dose.' : ', at the dose time.');
     };
     var checked = function (b) { return b.getAttribute('aria-checked') === 'true'; };
-    radioGroup(chips, checked, function (b) {
+    var land = null; // set while the cards are held back
+    radioGroup(chips, checked, function (b, byKey, quiet) {
       if (checked(b)) return;
       chips.forEach(function (x) { x.setAttribute('aria-checked', x === b ? 'true' : 'false'); });
       show(b);
-      arrive([doseNotif]);
+      if (land) land(byKey || quiet); // a choice made before the cards landed lands them both
+      else if (!byKey && !quiet) { doseNotif.classList.add('again'); arrive([doseNotif]); }
     });
     var first = chips.filter(checked)[0] || chips[0];
     if (first) show(first); // the clock and the status line come from the checked choice, not the HTML
     timing.hidden = false; // the choice only works with the script, so it only shows with it
-    // The cards drop in as the lock screen starts to rise into view (the same moment as its entrance), so
-    // they are never seen first and then replayed.
-    if ('IntersectionObserver' in window) {
-      new IntersectionObserver(function (entries, obs) {
-        if (!entries[0].isIntersecting) return;
-        arrive($$('.notif', lock).reverse()); // the older alert first, then the reminder on top of it
-        obs.disconnect();
-      }, { threshold: 0 }).observe(lock);
+    // The cards stay hidden (script only, motion allowed) until any part of their list is in the upper 60% of
+    // the viewport, then drop in once, so the arrival is seen rather than played below the fold.
+    var notifs = $('.notifs', lock);
+    if ('IntersectionObserver' in window && !reduceMotion.matches && notifs) {
+      $$('.notif', lock).forEach(function (n) { n.classList.add('pending'); });
+      var seen = new IntersectionObserver(function (entries) {
+        if (land && entries.some(function (e) { return e.isIntersecting; })) land(false);
+      }, { rootMargin: '0px 0px -40% 0px' });
+      land = function (still) {
+        seen.disconnect();
+        land = null;
+        $$('.notif', lock).forEach(function (n) { n.classList.remove('pending'); });
+        if (!still) arrive($$('.notif', lock).reverse()); // the older alert first, then the reminder on top of it
+      };
+      seen.observe(notifs);
     }
   }
 
