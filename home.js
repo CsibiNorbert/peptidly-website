@@ -115,6 +115,8 @@ import { parseDecimal, positive, drawTo, reconstitute } from './calc.js';
       el.setAttribute('data-pulses', String(Number(el.getAttribute('data-pulses') || 0) + 1));
       el.style.setProperty('--pulse-delay', (i * 0.5) + 's');
       el.classList.add('pulse');
+      // Backstop for a ring that never ran or never reported its end (a browser without animationcancel).
+      setTimeout(function () { el.classList.remove('pulse'); }, (i * 0.5 + 4.5) * 1000);
     });
   }
   function endPulse(e) { if (e.animationName === 'tap-ring') e.target.classList.remove('pulse'); }
