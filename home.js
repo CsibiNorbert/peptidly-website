@@ -490,10 +490,40 @@ import * as site from './picker.js';
     });
   }
 
-  /* ---------- Reminders: the timing chips move the lock screen ---------- */
+  /* ---------- One choice from a set (the WAI-ARIA radio group pattern) ---------- */
+
+  // One tab stop for the set; the arrow keys move the choice, Space or Enter takes the focused one.
+  function radioGroup(items, isChecked, choose) {
+    var sync = function () {
+      var any = items.some(isChecked);
+      items.forEach(function (el, i) { el.setAttribute('tabindex', isChecked(el) || (!any && i === 0) ? '0' : '-1'); });
+    };
+    var take = function (el) { choose(el); sync(); };
+    items.forEach(function (el, i) {
+      el.addEventListener('click', function () { take(el); });
+      el.addEventListener('keydown', function (e) {
+        var step = e.key === 'ArrowRight' || e.key === 'ArrowDown' ? 1 : e.key === 'ArrowLeft' || e.key === 'ArrowUp' ? -1 : 0;
+        if (step) {
+          e.preventDefault();
+          var next = items[(i + step + items.length) % items.length];
+          take(next);
+          next.focus();
+        } else if ((e.key === ' ' || e.key === 'Enter') && el.tagName !== 'BUTTON') {
+          // a <button> turns these into a click by itself
+          e.preventDefault();
+          take(el);
+        }
+      });
+    });
+    sync();
+    return sync;
+  }
+
+  /* ---------- Reminders: the timing choice moves the lock screen ---------- */
 
   var lock = $('.lock');
-  if (lock) {
+  var timing = $('.timing');
+  if (lock && timing) {
     var DOSE_AT = 8 * 60; // the example dose is due at 08:00
     var lockTime = $('[data-lock-time]', lock);
     var doseNotif = $('[data-notif-dose]', lock);
@@ -514,22 +544,25 @@ import * as site from './picker.js';
         el.classList.add('arrive');
       });
     };
-    var chips = $$('.t-chip');
-    chips.forEach(function (b) {
-      b.addEventListener('click', function () {
-        chips.forEach(function (x) { x.setAttribute('aria-pressed', x === b ? 'true' : 'false'); });
-        var at = clock(DOSE_AT - Number(b.getAttribute('data-lead')));
-        lockTime.textContent = at;
-        if (timingStatus) timingStatus.textContent = 'The reminder arrives at ' + at + '.';
-        arrive([doseNotif]);
-      });
+    var chips = $$('.t-chip', timing);
+    radioGroup(chips, function (b) { return b.getAttribute('aria-checked') === 'true'; }, function (b) {
+      if (b.getAttribute('aria-checked') === 'true') return;
+      chips.forEach(function (x) { x.setAttribute('aria-checked', x === b ? 'true' : 'false'); });
+      var lead = Number(b.getAttribute('data-lead'));
+      var at = clock(DOSE_AT - lead);
+      lockTime.textContent = at;
+      if (timingStatus) timingStatus.textContent = 'The reminder arrives at ' + at + (lead ? ', ' + lead + ' minutes before the dose.' : ', at the dose time.');
+      arrive([doseNotif]);
     });
+    timing.hidden = false; // the choice only works with the script, so it only shows with it
+    // The cards drop in as the lock screen starts to rise into view (the same moment as its entrance), so
+    // they are never seen first and then replayed.
     if ('IntersectionObserver' in window) {
       new IntersectionObserver(function (entries, obs) {
         if (!entries[0].isIntersecting) return;
         arrive($$('.notif', lock).reverse()); // the older alert first, then the reminder on top of it
         obs.disconnect();
-      }, { threshold: 0.5 }).observe(lock);
+      }, { threshold: 0 }).observe(lock);
     }
   }
 
@@ -543,32 +576,23 @@ import * as site from './picker.js';
     var pickWarn = $('[data-pick-warn]', picker);
     var pickHint = $('[data-pick-hint]', picker);
     var pickStatus = $('#pick-status');
-    var HINTS = {
-      front: 'Looking down at yourself — your left is on the left.',
-      back: 'Seen from behind — your left is still on the left.'
-    };
     var nameOf = function (z) { return z.getAttribute('data-name'); };
+    var pickable = function (z) { return site.OFF.indexOf(z.getAttribute('data-site')) === -1; };
 
     allZones.forEach(function (z) {
       var key = z.getAttribute('data-site');
       z.setAttribute('data-name', z.getAttribute('aria-label'));
       z.setAttribute('aria-label', nameOf(z) + site.describe(key));
-      if (site.OFF.indexOf(key) !== -1) {
-        z.setAttribute('data-state', 'off');
-        return;
-      }
-      z.setAttribute('role', 'button'); // only once the script is here to answer a tap
-      z.setAttribute('tabindex', '0');
+      if (pickable(z)) z.setAttribute('role', 'radio'); // only once the script is here to answer a tap
     });
-    var zones = allZones.filter(function (z) { return site.OFF.indexOf(z.getAttribute('data-site')) === -1; });
 
     var paint = function () {
       var current = null;
-      zones.forEach(function (z) {
+      allZones.filter(pickable).forEach(function (z) {
         var key = z.getAttribute('data-site');
         z.setAttribute('data-state', site.zoneState(key, picked));
         z.classList.toggle('is-next', key === site.NEXT);
-        z.setAttribute('aria-pressed', key === picked ? 'true' : 'false');
+        z.setAttribute('aria-checked', key === picked ? 'true' : 'false');
         if (key === picked) current = z;
       });
       var warn = site.warning(picked);
@@ -579,30 +603,32 @@ import * as site from './picker.js';
       return warn;
     };
 
-    var pick = function (z) {
-      picked = z.getAttribute('data-site');
-      var warn = paint();
-      if (pickStatus) pickStatus.textContent = nameOf(z) + ' picked.' + (warn ? ' ' + warn : '');
-    };
-    zones.forEach(function (z) {
-      z.addEventListener('click', function () { pick(z); });
-      z.addEventListener('keydown', function (e) {
-        if (e.key !== 'Enter' && e.key !== ' ') return;
-        e.preventDefault();
-        pick(z);
-      });
+    var syncs = [];
+    $$('.body-map', picker).forEach(function (svg) {
+      svg.setAttribute('role', 'radiogroup');
+      syncs.push(radioGroup($$('.zone', svg).filter(pickable),
+        function (z) { return z.getAttribute('data-site') === picked; },
+        function (z) {
+          picked = z.getAttribute('data-site');
+          var warn = paint();
+          syncs.forEach(function (s) { s(); });
+          if (pickStatus) pickStatus.textContent = nameOf(z) + ' picked.' + (warn ? ' ' + warn : '');
+        }));
     });
 
-    var viewBtns = $$('[data-view-btn]', picker);
-    viewBtns.forEach(function (b) {
-      b.addEventListener('click', function () {
-        var v = b.getAttribute('data-view-btn');
-        viewBtns.forEach(function (x) { x.setAttribute('aria-pressed', x === b ? 'true' : 'false'); });
+    var toggle = $('.view-toggle', picker);
+    var viewBtns = $$('[data-view-btn]', toggle);
+    radioGroup(viewBtns, function (b) { return b.getAttribute('aria-checked') === 'true'; }, function (b) {
+      var v = b.getAttribute('data-view-btn');
+      viewBtns.forEach(function (x) { x.setAttribute('aria-checked', x === b ? 'true' : 'false'); });
+      $$('.body-map', picker).forEach(function (svg) {
+        var on = svg.getAttribute('data-view') === v;
         // toggleAttribute, not .hidden: an SVG element has no hidden property, so assigning one does nothing.
-        $$('.body-map', picker).forEach(function (svg) { svg.toggleAttribute('hidden', svg.getAttribute('data-view') !== v); });
-        pickHint.textContent = HINTS[v];
+        svg.toggleAttribute('hidden', !on);
+        if (on) pickHint.textContent = svg.getAttribute('data-hint');
       });
     });
+    toggle.hidden = false; // the back of the body is only reachable with the script, so the switch waits for it
     paint();
   }
 

@@ -1233,8 +1233,9 @@ h2 {
   align-items: center;
   padding-bottom: var(--section);
 }
-.lock-stage { grid-column: 1 / span 6; grid-row: 1; display: flex; justify-content: center; }
-.reminders-text { grid-column: 8 / span 5; grid-row: 1; }
+.lock-stage { grid-column: 1 / span 6; grid-row: 1 / span 2; display: flex; justify-content: center; }
+.reminders-text { grid-column: 8 / span 5; grid-row: 1; align-self: end; }
+.reminders-facts { grid-column: 8 / span 5; grid-row: 2; align-self: start; }
 .facts-list { margin: 32px 0 0; padding: 0; list-style: none; display: grid; gap: 12px; max-width: 34rem; }
 .facts-list li { position: relative; padding-left: 22px; font-size: var(--step-xs); color: var(--muted); line-height: 1.5; }
 .facts-list li::before {
@@ -1304,7 +1305,7 @@ h2 {
   cursor: pointer;
   transition: background-color 160ms ease, color 160ms ease, border-color 160ms ease, transform 140ms var(--ease-out);
 }
-[data-ui] .t-chip[aria-pressed="true"] { background: var(--teal-soft); border-color: var(--accent); color: var(--accent-hover); }
+[data-ui] .t-chip[aria-checked="true"] { background: var(--teal-soft); border-color: var(--accent); color: var(--accent-hover); }
 [data-ui] .t-chip:active { transform: scale(0.97); }
 @media (hover: hover) and (pointer: fine) {
   [data-ui] .t-chip:hover { color: var(--ink); }
@@ -1325,6 +1326,7 @@ h2 {
   text-align: center;
 }
 [data-ui] .view-toggle { display: flex; justify-content: center; gap: 10px; }
+[data-ui] .view-toggle[hidden] { display: none; }
 [data-ui] .v-chip {
   min-height: 40px;
   padding: 0 26px;
@@ -1338,7 +1340,7 @@ h2 {
   cursor: pointer;
   transition: background-color 160ms ease, color 160ms ease, border-color 160ms ease;
 }
-[data-ui] .v-chip[aria-pressed="true"] { background: rgba(0, 180, 216, 0.18); border-color: var(--teal-line); color: var(--accent); }
+[data-ui] .v-chip[aria-checked="true"] { background: rgba(0, 180, 216, 0.18); border-color: var(--teal-line); color: var(--accent); }
 [data-ui] .map-box { margin: 12px auto 0; max-width: 340px; }
 [data-ui] .body-map { display: block; width: 100%; height: auto; }
 [data-ui] .body-map[hidden] { display: none; }
@@ -1356,7 +1358,7 @@ h2 {
 [data-ui] .zone:focus-visible > rect { stroke: var(--ink); stroke-width: 2; }
 @media (hover: hover) and (pointer: fine) {
   /* Not on the picked area: its teal or amber outline is the answer, so hover must not cover it. */
-  [data-ui] .zone:not([data-state="selected"]):not([data-state="selWarn"]):hover > rect { stroke: rgba(255, 255, 255, 0.4); }
+  [data-ui] .zone:not([data-state="selected"]):not([data-state="selWarn"]):not(:focus-visible):hover > rect { stroke: rgba(255, 255, 255, 0.4); }
 }
 [data-ui] .zone .badge { display: none; pointer-events: none; }
 [data-ui] .zone.is-next .badge { display: inline; }
@@ -1380,7 +1382,7 @@ h2 {
   .loop-text { grid-column: 1 / span 6; }
   .loop-stage { grid-column: 7 / span 6; }
   .lock-stage { grid-column: 1 / span 6; }
-  .reminders-text { grid-column: 7 / span 6; }
+  .reminders-text, .reminders-facts { grid-column: 7 / span 6; }
   .sites-text { grid-column: 1 / span 6; }
   .picker-stage { grid-column: 7 / span 6; }
   .steps { margin-top: 32px; }
@@ -1434,10 +1436,11 @@ h2 {
 
   .loop { display: flex; flex-direction: column; align-items: stretch; }
   .reminders, .sites { display: flex; flex-direction: column; align-items: stretch; }
-  .lock-stage, .picker-stage { margin-top: 40px; }
+  .lock-stage, .picker-stage { margin-top: 32px; }
+  .reminders-facts { margin-top: 32px; }
   [data-ui] .lock-time { font-size: 56px; }
   [data-ui].lock { min-height: 0; padding-bottom: 28px; }
-  /* The figure has empty sides, so the map can run to the card's edge: that keeps the abdomen squares at
+  /* The figure has empty sides, so the map can run past the card's padding: that keeps the abdomen squares at
      24 px or more on a 320 px screen (WCAG 2.5.8). */
   [data-ui].picker { padding-inline: 12px; }
   [data-ui] .map-box { margin-inline: -20px; max-width: none; }

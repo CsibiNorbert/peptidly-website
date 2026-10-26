@@ -72,7 +72,7 @@ function view(v) {
   }
   // role=group, not the default img: children of an img are presentational, which would hide the buttons.
   const name = v === 'front' ? 'Front of the body' : 'Back of the body';
-  return `<svg class="body-map" data-view="${v}" viewBox="0 0 ${g.VIEW_BOX.w} ${g.VIEW_BOX.h}" role="group" aria-label="${name}" focusable="false"${v === 'back' ? ' hidden' : ''}>
+  return `<svg class="body-map" data-view="${v}" viewBox="0 0 ${g.VIEW_BOX.w} ${g.VIEW_BOX.h}" role="group" aria-label="${name}" data-hint="${v === 'front' ? en.bodyHintFront : en.bodyHintBack}" focusable="false"${v === 'back' ? ' hidden' : ''}>
 ${DEFS(id)}
 <g mask="url(#${id}-mask)">
 ${FIGURE(id)}

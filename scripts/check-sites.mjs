@@ -1,5 +1,5 @@
 // The site-rotation demo must show what the app would show for the same history. This runs the app's own
-// rotation and body-map logic (helix/lib/dose-log) on the demo's history from home.js and fails if the
+// rotation and body-map logic (helix/lib/dose-log) on the demo's history in picker.js and fails if the
 // page's suggestion, skipped line, switched-off areas, rest window or zone states disagree.
 // Run: node --experimental-strip-types scripts/check-sites.mjs   (needs the sibling Peptides repo)
 import fs from 'node:fs';
@@ -42,13 +42,23 @@ expect(JSON.stringify([...OFF].sort()) === JSON.stringify([...appOff].sort()),
 
 const anchor = rot.anchorFromRecentUses(USES, ENABLED);
 const steer = rot.steerFromAnchor(anchor, ENABLED, USES, REST_HOURS);
-expect(steer && steer.key === NEXT, `suggestion: page ${NEXT}, app ${steer && steer.key}`);
-const fmtAgo = (h) => h < 1 ? en.time.ago.justNow : h < 24 ? `${Math.round(h)}h ago` : `${Math.round(h / 24)}d ago`;
+if (!steer) { console.error(`the app suggests nothing for this history (anchor ${anchor})`); process.exit(1); }
+expect(steer.key === NEXT, `suggestion: page ${NEXT}, app ${steer.key}`);
+// The app's formatHoursAgo (db/queries/injectionSiteLog.ts, which needs the database, so not importable here),
+// worded from its own catalogue so a change of wording in the app turns this red.
+const fmtAgo = (h) => {
+  if (h < 1) return en.time.ago.justNow;
+  const [n, k] = h < 24 ? [Math.round(h), 'hours'] : [Math.round(h / 24), 'days'];
+  return en.time.ago[`${k}_${n === 1 ? 'one' : 'other'}`].replace('{count}', n);
+};
+for (const h of [0.5, 22, 50, 26]) expect(page.ago(h) === fmtAgo(h), `ago(${h}): page "${page.ago(h)}", app "${fmtAgo(h)}"`);
 const skippedLine = en.injectionSites.steerSkipped.replace('{list}',
   steer.skipped.map((s) => `${en.injectionSites.short[s.key]} ${s.hoursAgo != null ? fmtAgo(s.hoursAgo) : ''}`.trim()).join(' · '));
 expect(html.includes(`<p class="pick-steer">${skippedLine}</p>`), `skipped line: the app says "${skippedLine}"`);
 
 // Zone states and the warning, picked = each pickable area in turn, against the app's zoneState and rollup.
+// The hint under the map, before the script runs, is the app's.
+expect(html.includes(`<p class="pick-hint" data-pick-hint>${en.injectionSites.bodyHintFront}</p>`), `hint: the app says "${en.injectionSites.bodyHintFront}"`);
 const keys = [...html.matchAll(/class="zone[^"]*" data-site="([a-z_]+)"/g)].map((m) => m[1]);
 expect(keys.length === 14, `expected 14 areas in the body map, found ${keys.length}`);
 // The map baked into index.html (scripts/build-body-map.mjs) must start where the script would.

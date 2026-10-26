@@ -275,27 +275,21 @@
       <section class="reminders wrap" id="reminders" aria-labelledby="reminders-title">
         <div class="reminders-text">
           <h2 id="reminders-title">Reminders that know what is due.</h2>
-          <p class="section-lead">Every scheduled dose gets a reminder, as early as you like. Pick a timing to see when this one arrives for an 08:00 dose.</p>
-          <div class="timing" data-ui role="group" aria-labelledby="timing-label">
+          <p class="section-lead">Every scheduled dose gets a reminder, at its time or up to 30 minutes before. Pick a timing to see when this one arrives for an 08:00 dose.</p>
+          <div class="timing" data-ui hidden>
             <p class="timing-label" id="timing-label">Reminder timing</p>
-            <div class="timing-chips">
-              <button type="button" class="t-chip" data-lead="0" aria-pressed="false">At dose time</button>
-              <button type="button" class="t-chip" data-lead="5" aria-pressed="false">5 min before</button>
-              <button type="button" class="t-chip" data-lead="10" aria-pressed="false">10 min</button>
-              <button type="button" class="t-chip" data-lead="15" aria-pressed="true">15 min</button>
-              <button type="button" class="t-chip" data-lead="30" aria-pressed="false">30 min</button>
+            <div class="timing-chips" role="radiogroup" aria-labelledby="timing-label">
+              <button type="button" class="t-chip" role="radio" data-lead="0" aria-checked="false" tabindex="-1">At dose time</button>
+              <button type="button" class="t-chip" role="radio" data-lead="5" aria-checked="false" tabindex="-1">5 min before</button>
+              <button type="button" class="t-chip" role="radio" data-lead="10" aria-checked="false" tabindex="-1">10 min</button>
+              <button type="button" class="t-chip" role="radio" data-lead="15" aria-checked="true">15 min</button>
+              <button type="button" class="t-chip" role="radio" data-lead="30" aria-checked="false" tabindex="-1">30 min</button>
             </div>
-            <p class="sr-only" id="timing-status" aria-live="polite"></p>
           </div>
-          <ul class="facts-list">
-            <li>Log the dose and its reminder is cancelled.</li>
-            <li>Quiet hours keep reminders out of the night.</li>
-            <li>Reminders are set on your phone, so they arrive without a signal.</li>
-            <li>When a vial falls to 20%, or the level you choose, a low-stock alert follows.</li>
-          </ul>
         </div>
         <div class="lock-stage">
           <div class="lock" data-ui role="group" aria-label="A phone lock screen with two Peptidly notifications">
+            <p class="sr-only" id="timing-status" aria-live="polite">The reminder arrives at 07:45, 15 minutes before the dose.</p>
             <p class="lock-time" aria-hidden="true"><span data-lock-time>07:45</span></p>
             <p class="lock-date" data-lock-date aria-hidden="true">Monday 26 October</p>
             <ul class="notifs">
@@ -307,12 +301,17 @@
               <li class="notif">
                 <div class="notif-head"><img src="/assets/peptidly-mark-80.png" alt="" width="18" height="18"><span>Peptidly</span><i>·</i><span>3h ago</span></div>
                 <p class="notif-title">Low Stock Alert</p>
-                <p class="notif-body">AM blend is at 18% — <span class="amt"><span class="mask" data-d="8.8" aria-hidden="true"></span><span class="sr-only">what is left in</span> mg</span> remaining</p>
+                <p class="notif-body">AM blend is at 18% <span class="sr-only">, amount hidden</span><span aria-hidden="true">— <span class="amt"><span class="mask" data-d="8.8"></span> mg</span> remaining</span></p>
               </li>
             </ul>
           </div>
         </div>
-
+        <ul class="facts-list reminders-facts">
+          <li>Log the dose and its reminder is cancelled.</li>
+          <li>Quiet hours keep reminders out of the night.</li>
+          <li>Reminders are set on your phone, so they arrive without a signal.</li>
+          <li>When a vial falls to 20%, a low-stock alert follows.</li>
+        </ul>
       </section>
 
       <!-- Site rotation: the dose screen's body picker, drawn from the app's own geometry. -->
@@ -330,13 +329,13 @@
 
         <div class="picker-stage">
           <div class="picker" data-ui role="group" aria-label="The injection site picker from the dose screen. Tap an area to pick it.">
-            <div class="view-toggle">
-              <button type="button" class="v-chip" data-view-btn="front" aria-pressed="true">FRONT</button> <!-- taste-skill-ignore: app UI inside [data-ui] -->
-              <button type="button" class="v-chip" data-view-btn="back" aria-pressed="false">BACK</button> <!-- taste-skill-ignore: app UI inside [data-ui] -->
+            <div class="view-toggle" role="radiogroup" aria-label="View" hidden>
+              <button type="button" class="v-chip" role="radio" data-view-btn="front" aria-checked="true">FRONT</button> <!-- taste-skill-ignore: app UI inside [data-ui] -->
+              <button type="button" class="v-chip" role="radio" data-view-btn="back" aria-checked="false" tabindex="-1">BACK</button> <!-- taste-skill-ignore: app UI inside [data-ui] -->
             </div>
             <div class="map-box">
 <!-- body-map:start (generated by scripts/build-body-map.mjs; do not edit by hand) -->
-<svg class="body-map" data-view="front" viewBox="0 0 260 270" role="group" aria-label="Front of the body" focusable="false">
+<svg class="body-map" data-view="front" viewBox="0 0 260 270" role="group" aria-label="Front of the body" data-hint="Looking down at yourself — your left is on the left." focusable="false">
 <defs>
   <linearGradient id="bm-front-skin" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#26405F"/><stop offset=".55" stop-color="#1A2E49"/><stop offset="1" stop-color="#13233A"/></linearGradient>
   <radialGradient id="bm-front-hi" cx=".5" cy=".3" r=".65"><stop offset="0" stop-color="#fff" stop-opacity=".16"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></radialGradient>
@@ -368,7 +367,7 @@
 <text class="side" x="52" y="142" text-anchor="middle" aria-hidden="true">L</text>
 <text class="side" x="208" y="142" text-anchor="middle" aria-hidden="true">R</text>
 </svg>
-<svg class="body-map" data-view="back" viewBox="0 0 260 270" role="group" aria-label="Back of the body" focusable="false" hidden>
+<svg class="body-map" data-view="back" viewBox="0 0 260 270" role="group" aria-label="Back of the body" data-hint="Seen from behind — your left is still on the left." focusable="false" hidden>
 <defs>
   <linearGradient id="bm-back-skin" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#26405F"/><stop offset=".55" stop-color="#1A2E49"/><stop offset="1" stop-color="#13233A"/></linearGradient>
   <radialGradient id="bm-back-hi" cx=".5" cy=".3" r=".65"><stop offset="0" stop-color="#fff" stop-opacity=".16"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></radialGradient>
