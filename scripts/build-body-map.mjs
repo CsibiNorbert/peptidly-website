@@ -43,6 +43,9 @@ const DEFS = (id) => `<defs>
   <mask id="${id}-mask"><rect x="0" y="-10" width="${g.VIEW_BOX.w}" height="${g.VIEW_BOX.h + 20}" fill="url(#${id}-fade)"/></mask>
 </defs>`;
 
+// Drawn as a diagram plate on the site: the app's figure inside crop marks, which follow the app's VIEW_BOX.
+const { w: VW, h: VH } = g.VIEW_BOX;
+const CROP = `M4 18V4H18M${VW - 18} 4H${VW - 4}V18M${VW - 4} ${VH - 18}V${VH - 4}H${VW - 18}M18 ${VH - 4}H4V${VH - 18}`;
 const FIGURE = (id) => `<g fill="url(#${id}-skin)">
   <rect x="117" y="-6" width="26" height="28" rx="9"/>
   <g transform="${g.ARM_TRANSFORM.L}"><rect x="-10" y="-14" width="20" height="104" rx="10"/></g>
@@ -80,6 +83,7 @@ ${DEFS(id)}
 ${FIGURE(id)}
 ${parts.join('\n')}
 </g>
+<g class="crop" aria-hidden="true"><path d="${CROP}"/></g>
 <text class="side" x="52" y="142" text-anchor="middle" aria-hidden="true">${en.sideInitialLeft}</text>
 <text class="side" x="208" y="142" text-anchor="middle" aria-hidden="true">${en.sideInitialRight}</text>
 </svg>`;
