@@ -1119,15 +1119,15 @@ h2 {
   min-height: min(90svh, 860px);
   padding-block: clamp(80px, 10vw, 140px);
 }
-.cta-copy { grid-column: 1 / span 6; align-self: end; }
+.cta-copy { grid-column: 1 / span 6; }
 .cta h2 { font-size: var(--step-xl); line-height: 0.98; letter-spacing: -0.035em; max-width: 12ch; }
 .cta-copy p { margin-top: 24px; max-width: 34ch; font-size: var(--step-s); font-weight: 500; }
 .cta .play { margin-top: 32px; }
 .cta a:hover { color: var(--on-accent); }
 
 [data-ui].welcome {
-  grid-column: 8 / span 5;
-  justify-self: end;
+  grid-column: 7 / span 4;
+  justify-self: start;
   width: 100%;
   max-width: 380px;
   border-radius: 32px;
@@ -1170,7 +1170,8 @@ h2 {
   align-items: start;
 }
 .foot-statement { grid-column: span 6; }
-.foot-statement p:first-child { font-size: var(--step-s); font-weight: 600; line-height: 1.4; color: var(--ink); max-width: 44ch; }
+.foot-brand { display: flex; width: fit-content; margin-bottom: 20px; }
+.foot-statement p:first-of-type { font-size: var(--step-s); font-weight: 600; line-height: 1.4; color: var(--ink); max-width: 44ch; }
 .foot-statement .small { margin-top: 10px; max-width: 52ch; }
 .foot-nav { grid-column: span 3; display: flex; flex-direction: column; gap: 4px; }
 .foot-mail { grid-column: span 3; }
@@ -1345,7 +1346,10 @@ h2 {
 [data-ui] .badge text { font-size: 7.5px; font-weight: 700; letter-spacing: 0.8px; fill: var(--accent); }
 [data-ui] .pick-label { margin-top: 10px; font-size: 18px; font-weight: 600; color: var(--accent); }
 [data-ui] .pick-label.warn { color: var(--amber); }
-[data-ui] .pick-warn { margin: 6px auto 0; max-width: 30ch; font-size: 13px; color: var(--amber); }
+[data-ui] .pick-warn { margin: 12px auto 0; max-width: 30ch; font-size: 13px; color: var(--amber); }
+[data-ui] .pick-warn-slot { display: grid; }
+[data-ui] .pick-warn-slot > * { grid-area: 1 / 1; }
+[data-ui] .pick-warn-sizer { visibility: hidden; }
 [data-ui] .pick-hint { margin-top: 8px; font-size: 13px; color: var(--muted); }
 [data-ui] .pick-steer { margin-top: 14px; font-family: var(--mono); font-size: 12px; color: var(--muted); text-wrap: balance; } /* taste-skill-ignore: app UI inside [data-ui] */
 
@@ -1378,7 +1382,7 @@ h2 {
   .faq h2 { grid-column: 1 / -1; position: static; max-width: none; margin-bottom: 40px; }
   .faq-list { grid-column: 1 / -1; }
   .cta-copy { grid-column: 1 / span 7; }
-  [data-ui].welcome { grid-column: 8 / span 5; }
+  [data-ui].welcome { grid-column: 8 / span 5; justify-self: end; }
   .foot-statement { grid-column: span 12; }
   .foot-nav { grid-column: span 6; }
   .foot-mail { grid-column: span 6; }

@@ -403,9 +403,10 @@
 <!-- body-map:end -->
             </div>
             <p class="pick-label" data-pick-label>Right thigh</p>
-            <p class="pick-warn" data-pick-warn hidden></p>
             <p class="pick-hint" data-pick-hint>Looking down at yourself — your left is on the left.</p>
             <p class="pick-steer">skipped resting: L thigh 2d ago</p> <!-- taste-skill-ignore: app UI inside [data-ui] -->
+            <!-- Below the picker, where the app's dose screen puts its warning banner (dose-log/[id].tsx). -->
+            <div class="pick-warn-slot" data-pick-warn-slot><p class="pick-warn" data-pick-warn hidden></p></div>
             <p class="sr-only" id="pick-status" aria-live="polite"></p>
           </div>
           <p class="stage-caption"><span class="js-only">Tap an area to pick it. </span>Amber means it was used in the last three days.</p>
@@ -569,6 +570,10 @@
     <footer class="foot wrap">
       <div class="foot-row">
         <div class="foot-statement">
+          <div class="brand foot-brand" aria-hidden="true">
+            <img src="/assets/peptidly-mark-80.png" alt="" width="32" height="32">
+            <span class="wordmark">PEPTIDLY</span>
+          </div>
           <p>No medical advice, just record-keeping for people who already know what they're doing.</p>
           <p class="small">For adults 18 and over. Peptidly has no relationship with any peptide manufacturer, distributor or vendor.</p>
         </div>

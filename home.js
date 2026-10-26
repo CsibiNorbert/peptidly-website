@@ -616,6 +616,20 @@ import * as site from './picker.js';
       z.setAttribute('aria-label', nameOf(z) + site.describe(key));
       if (pickable(z)) z.setAttribute('role', 'radio'); // only once the script is here to answer a tap
     });
+    // Every warning a pick can show sits invisibly in the warning's own cell, so the cell is always as tall as
+    // the tallest one at this width: picking an area never changes the card's height or moves the page.
+    var warnSlot = $('[data-pick-warn-slot]', picker);
+    // ponytail: warnings depend on the pick alone (static USES); if they ever depend on more, build these from that too.
+    var warnings = new Set();
+    allZones.filter(pickable).forEach(function (z) { warnings.add(site.warning(z.getAttribute('data-site'))); });
+    warnings.delete('');
+    warnings.forEach(function (w) {
+      var sizer = document.createElement('p');
+      sizer.className = 'pick-warn pick-warn-sizer';
+      sizer.setAttribute('aria-hidden', 'true');
+      sizer.textContent = w;
+      warnSlot.appendChild(sizer);
+    });
 
     var paint = function () {
       var current = null;
