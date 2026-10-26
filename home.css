@@ -748,12 +748,33 @@ h2 {
   display: inline-flex;
   align-items: center;
 }
-[data-ui].phone[data-state="1"] .row-log.pulse { animation: nudge-ring 2.4s ease-out 2; }
-@keyframes nudge-ring {
-  0% { box-shadow: 0 0 0 0 rgba(0, 180, 216, 0.55); } /* taste-skill-ignore: app UI inside [data-ui] */
-  70% { box-shadow: 0 0 0 12px rgba(0, 180, 216, 0); } /* taste-skill-ignore: app UI inside [data-ui] */
-  100% { box-shadow: 0 0 0 0 rgba(0, 180, 216, 0); } /* taste-skill-ignore: app UI inside [data-ui] */
+/* "You can press this": a green ring (the colour a dose turns once it is Taken) leaves each control the
+   visitor can use in the replicas. Two rings, under 5 s a burst (WCAG 2.2.2); home.js re-runs a burst when
+   the screen comes back into view, and stops for good once the visitor has used it. */
+[data-ui] .row-log.pulse,
+[data-ui] .field-box.wants.pulse { animation: tap-ring 2.2s ease-out 2; animation-delay: var(--pulse-delay, 0s); }
+@keyframes tap-ring {
+  0% { box-shadow: 0 0 0 0 rgba(74, 222, 128, 0.6); } /* taste-skill-ignore: app UI inside [data-ui] */
+  70% { box-shadow: 0 0 0 12px rgba(74, 222, 128, 0); } /* taste-skill-ignore: app UI inside [data-ui] */
+  100% { box-shadow: 0 0 0 0 rgba(74, 222, 128, 0); } /* taste-skill-ignore: app UI inside [data-ui] */
 }
+/* The same hint in words, above the next Log only, until the visitor has logged once. No motion, so it
+   stays under reduced motion too. */
+[data-ui] .try-tag {
+  display: none;
+  position: absolute;
+  top: 10px;
+  right: 14px;
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: rgba(74, 222, 128, 0.12);
+  color: var(--green);
+  font-size: 11px;
+  font-weight: 700;
+  line-height: 1.5;
+  pointer-events: none;
+}
+[data-ui].phone:not(.tried) .dose-row.is-next .try-tag { display: block; }
 [data-ui] .next-card.all-done .next-log { visibility: hidden; }
 
 [data-ui] .today-head {
