@@ -90,6 +90,8 @@ for (const v of [...vials, ...invalid]) {
   }
 }
 
+// The calculator page says the maths is tested on "thousands of combinations"; keep that true.
+if (cases < 2000) throw new Error(`only ${cases} cases; the calculator page promises thousands`);
 // Every kind of state must actually have been compared, or a pass means nothing.
 for (const [k, n] of Object.entries(seen)) if (n === 0) throw new Error(`no case exercised ${k}`);
 if (diffs.length) {
@@ -97,4 +99,16 @@ if (diffs.length) {
   console.error(`${diffs.length} of ${cases} cases differ from the app`);
   process.exit(1);
 }
-console.log(`calculator matches the app on all ${cases} cases (${JSON.stringify(seen)})`);
+// The calculator appears on two pages and home.js drives both by the same ids, so the two copies of the
+// instrument must stay identical: a fix made on one page only would leave the other one wrong.
+const root = resolve(dirname(fileURLToPath(import.meta.url)), '..');
+const instrument = (file) => {
+  const m = readFileSync(resolve(root, file), 'utf8').replace(/\r\n/g, '\n').match(/<!-- instrument:start -->[\s\S]*?<!-- instrument:end -->/);
+  if (!m) throw new Error(`${file}: no instrument:start / instrument:end block`);
+  return m[0];
+};
+if (instrument('index.html') !== instrument('peptide-calculator.html')) {
+  console.error('the calculator in peptide-calculator.html differs from the one in index.html');
+  process.exit(1);
+}
+console.log(`calculator matches the app on all ${cases} cases (${JSON.stringify(seen)}); both pages carry the same instrument`);

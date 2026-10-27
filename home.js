@@ -173,8 +173,48 @@ import * as site from './picker.js';
 
   var status = $('#calc-status');
   var statusTimer = 0;
+  // The calculator page writes the maths out with the visitor's own numbers, one line per step.
+  var fx = { conc: $('#f-conc'), vol: $('#f-vol'), units: $('#f-units') };
 
   function trim(n) { return String(Math.round(n * 1000) / 1000); }
+
+  function setLine(el, text, live) {
+    if (!el || el.textContent === text) return;
+    el.textContent = text;
+    el.classList.toggle('is-live', live);
+  }
+
+  // Figures are printed as the hero prints them, without thousands separators: a comma typed in a field
+  // is read as a decimal point, so a grouping comma here would contradict the field. A figure stays
+  // joined to its unit, and "=" to its result, by no-break spaces; a long line breaks at ÷ or ×.
+  function showMaths(v, w, d, r) {
+    if (!fx.conc) return;
+    var S = ' ';
+    setLine(fx.conc, r.conc === null ? 'Enter the vial size and the BAC water.'
+      : trim(v) + S + 'mg ÷ ' + trim(w) + S + 'ml =' + S + r.conc.toFixed(2) + S + 'mg/ml', r.conc !== null);
+    var noDose = r.conc === null ? 'Enter the vial size and the BAC water first.' : 'Enter your dose.';
+    if (r.volume === null) { setLine(fx.vol, noDose, false); setLine(fx.units, noDose, false); return; }
+    var dose = trim(d);
+    var per = trim(r.conc * 1000);
+    var ml = r.volume.toFixed(3);
+    var units = drawTo(r.units);
+    // The draw card rounds as the app does. A reader who works a line out from its printed figures, rounding
+    // half up, can land one step away from the card on a tie. Integer maths says whether the printed division
+    // rounds to the card's volume, and whether the card's volume times 100 rounds to its units.
+    var a = Math.round(Number(dose) * 1000);
+    var b = Math.round(Number(per) * 1000);
+    var plain = b > 0 && Math.floor((2000 * a + b) / (2 * b)) === Math.round(Number(ml) * 1000)
+      && drawTo(Number(ml) * 100) === units;
+    if (plain) {
+      setLine(fx.vol, dose + S + 'mcg ÷ ' + per + S + 'mcg/ml =' + S + ml + S + 'ml', true);
+      setLine(fx.units, ml + S + 'ml × 100 =' + S + units + S + 'units', true);
+    } else {
+      // Otherwise both lines carry the volume to four places, which holds, and say what the card shows.
+      var ml4 = String(Math.round(r.volume * 10000) / 10000);
+      setLine(fx.vol, dose + S + 'mcg ÷ ' + per + S + 'mcg/ml =' + S + ml4 + S + 'ml, shown above as ' + ml, true);
+      setLine(fx.units, ml4 + S + 'ml × 100 =' + S + String(Math.round(Number(ml4) * 10000) / 100) + S + 'units, shown above as ' + units, true);
+    }
+  }
 
   function announce(r) {
     if (!status) return;
@@ -201,6 +241,7 @@ import * as site from './picker.js';
     out.conc.textContent = r.conc === null ? '—' : r.conc.toFixed(2);
     out.doses.textContent = r.dosesPerVial === null ? '—' : String(r.dosesPerVial);
     out.doses.closest('.readout > div').classList.toggle('is-empty', r.dosesPerVial === null);
+    showMaths(v, w, d, r);
 
     if (r.units !== null) {
       var units = r.units;
@@ -469,7 +510,10 @@ import * as site from './picker.js';
       '.cycles h2, .cycles .section-lead, .sheet, .note',
       '.privacy-head > *, .facts-group, .facts-rows > div',
       '.faq h2, .faq details',
-      '.cta-copy > *, .welcome'
+      '.cta-copy > *, .welcome',
+      '.maths-head > *, .formula li',
+      '.units-head > *, .unit-rows > div',
+      '.close-copy > *, .close-actions'
     ];
     var revealer = new IntersectionObserver(function (entries) {
       var k = 0;

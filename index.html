@@ -3,14 +3,14 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Peptidly — Peptide cycle tracker for Android</title>
+    <title>Peptidly — Peptide tracker and calculator for Android</title>
     <meta name="description" content="A personal peptide cycle tracker for Android. Plan cycles, log doses in one tap, get syringe units from your vial and BAC water, and see when stock runs low.">
     <link rel="canonical" href="https://peptidly.co.uk/">
     <meta name="theme-color" content="#0D1B2A">
     <meta property="og:type" content="website">
     <meta property="og:site_name" content="Peptidly">
     <meta property="og:locale" content="en_GB">
-    <meta property="og:title" content="Peptidly — Peptide cycle tracker for Android">
+    <meta property="og:title" content="Peptidly — Peptide tracker and calculator for Android">
     <meta property="og:description" content="Plan cycles, log doses in one tap, get exact syringe units from your vial and BAC water, and see when your supply runs low.">
     <meta property="og:url" content="https://peptidly.co.uk/">
     <meta property="og:image" content="https://peptidly.co.uk/assets/og-image.jpg">
@@ -72,8 +72,8 @@
         <img src="/assets/peptidly-mark-80.png" alt="" width="32" height="32">
         <span class="wordmark" aria-hidden="true">PEPTIDLY</span>
       </a>
-      <nav class="top-nav" aria-label="Sections">
-        <a href="#calculator">Calculator</a>
+      <nav class="top-nav" aria-label="Main">
+        <a href="/peptide-calculator">Calculator</a>
         <a href="#how-it-works">How it works</a>
         <a href="#privacy">Privacy</a>
         <a href="#faq">FAQ</a>
@@ -86,7 +86,7 @@
       <section class="hero wrap" id="calculator" aria-labelledby="hero-title">
         <div class="hero-copy">
           <h1 id="hero-title">Peptide cycles, <span class="payoff">finally organised.</span></h1>
-          <p class="lead">Plan each cycle, log a dose in one tap, and let Peptidly do the reconstitution maths and count down your vials.</p>
+          <p class="lead">Peptidly is a peptide tracker and calculator for Android. Plan each cycle, log a dose in one tap, and let it do the reconstitution maths and count down your vials.</p>
           <div class="actions">
             <a class="play" href="https://play.google.com/store/apps/details?id=com.peptidly.app&amp;referrer=utm_source%3Dpeptidly.co.uk%26utm_medium%3Dweb">
               <img src="/assets/google-play-badge.png" alt="Get it on Google Play" width="646" height="250">
@@ -96,6 +96,7 @@
         </div>
 
         <div class="hero-stage">
+          <!-- instrument:start -->
           <div class="instrument" data-ui role="group" aria-label="The Peptidly reconstitution calculator. Change the numbers to try it.">
             <div class="vial-wrap">
               <svg class="vial" viewBox="0 0 120 300" width="120" height="300" aria-hidden="true" focusable="false">
@@ -199,7 +200,10 @@
               <p class="sr-only" id="calc-status" aria-live="polite"></p>
             </div>
           </div>
-          <p class="stage-note">BAC water is bacteriostatic water, used to mix a powdered vial. Units are the marks on a 1 ml insulin syringe; the app shows them as IU. The calculator only does arithmetic on the numbers you enter. It does not recommend a dose or a compound.</p>
+          <!-- instrument:end -->
+          <p class="stage-note">BAC water is bacteriostatic water, used to mix a powdered vial. Units are the marks on a 1 ml insulin syringe; the app shows them as IU. The calculator only does arithmetic on the numbers you enter. It does not recommend a dose or a compound. Either a comma or a dot marks a decimal, so type thousands without a separator.</p>
+          <noscript><p class="stage-note">The calculator needs JavaScript to run.</p></noscript>
+          <a class="text-link stage-link" href="/peptide-calculator">Open the peptide calculator<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h13M13 7l5 5-5 5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></a>
         </div>
       </section>
 

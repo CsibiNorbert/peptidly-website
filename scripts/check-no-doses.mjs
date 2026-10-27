@@ -16,12 +16,16 @@ const files = process.argv.length > 2
 // Allowed, each once per occurrence:
 // - the syringe the draw is read on, and the vial volume the level is drawn against;
 // - the hero calculator's example vial label: the visitor's own input, not a dose;
-// - a concentration (mg/ml), which describes a mixed vial, not an amount to take.
+// - a concentration (mg/ml), which describes a mixed vial, not an amount to take;
+// - the three unit definitions on the calculator page, exactly as written there (conversions, not amounts).
 const ALLOWED = [
   /\b1 ?ml insulin syringe/gi,
   /\b3 ml vial\b/gi,
   /class="vial-label"[^>]*>10 mg</g,
   /\b\d+(?:\.\d+)?(?:\s*<[^>]*>)*\s*mg\s*\/\s*ml\b/gi,
+  /\b1 mg = 1,?000 mcg\b/g,
+  /\b100 units = 1 ml\b/g,
+  /\b1 unit = 0\.01 ml\b/g,
 ];
 const DOSE = /\b\d+(?:[.,]\d+)?\s*(?:mcg|µg|mg|ml|units?|iu|u)\b/gi;
 const MASK = /class="mask"([^>]*)>([^<]*)</g;
