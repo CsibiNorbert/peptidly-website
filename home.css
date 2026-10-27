@@ -1353,6 +1353,97 @@ h2 {
 [data-ui] .pick-hint { margin-top: 8px; font-size: 13px; color: var(--muted); }
 [data-ui] .pick-steer { margin-top: 14px; font-family: var(--mono); font-size: 12px; color: var(--muted); text-wrap: balance; } /* taste-skill-ignore: app UI inside [data-ui] */
 
+/* ---------- Calculator page (/peptide-calculator) ---------- */
+
+.top-nav a[aria-current="page"] { color: var(--ink); text-decoration: underline; text-decoration-thickness: 2px; text-underline-offset: 8px; }
+.stage-link { margin-left: calc(var(--vial-w) + 28px); margin-top: 16px; font-size: var(--step-xs); }
+
+.maths { padding-bottom: var(--section); }
+.maths-grid, .units-grid, .close-grid {
+  display: grid;
+  grid-template-columns: repeat(12, minmax(0, 1fr));
+  column-gap: var(--col-gap);
+  align-items: start;
+}
+.maths-head, .units-head { grid-column: 1 / span 4; position: sticky; top: 96px; }
+
+/* The three steps: one tonal row each, the visitor's numbers set in the app's mono. */
+.formula { grid-column: 5 / span 8; display: grid; gap: 8px; margin: 0; padding: 0; list-style: none; counter-reset: step; }
+.formula li {
+  counter-increment: step;
+  display: grid;
+  grid-template-columns: 32px minmax(0, 1fr);
+  column-gap: 20px;
+  padding: 24px 28px;
+  border-radius: var(--radius);
+  background: var(--surface);
+}
+.formula li::before {
+  content: counter(step);
+  grid-row: 1 / span 4;
+  padding-top: 4px;
+  color: var(--muted);
+  font-family: var(--mono); /* taste-skill-ignore: a step number is data */
+  font-size: 14px;
+  font-weight: 600;
+}
+.formula h3 { font-size: var(--step-m); font-weight: 700; line-height: 1.2; letter-spacing: -0.015em; }
+.formula-words { margin-top: 6px; color: var(--muted); font-size: var(--step-s); }
+.formula-note { margin-top: 6px; max-width: 52ch; color: var(--muted); font-size: var(--step-xs); line-height: 1.5; }
+.formula-live { margin-top: 16px; }
+.f-out { color: var(--muted); font-size: var(--step-xs); }
+.f-out.is-live {
+  color: var(--ink);
+  font-family: var(--mono); /* taste-skill-ignore: the visitor's own numbers, set as the app sets them */
+  font-size: clamp(17px, 1.6vw, 21px);
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  overflow-wrap: anywhere;
+}
+
+/* Unit facts: two-ended rows, as the privacy facts on the home page. */
+.unit-rows { grid-column: 5 / span 8; margin: 0; display: grid; gap: 8px; }
+.unit-rows > div {
+  display: grid;
+  grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+  column-gap: 32px;
+  align-items: baseline;
+  padding: 24px 28px;
+  border-radius: var(--radius);
+  background: var(--surface);
+}
+.unit-fact {
+  font-family: var(--mono); /* taste-skill-ignore: a conversion is data */
+  font-size: clamp(20px, 2vw, 26px);
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  color: var(--ink);
+  white-space: nowrap;
+}
+.unit-rows dd { margin: 0; color: var(--muted); font-size: var(--step-xs); line-height: 1.55; }
+
+/* The close: one quiet line to the app, no second accent field. */
+.calc-close { padding-block: 0 var(--section); }
+.close-copy { grid-column: 1 / span 6; }
+.close-copy p { margin-top: 20px; max-width: 46ch; color: var(--muted); font-size: var(--step-s); }
+.close-actions { grid-column: 8 / span 5; display: flex; flex-direction: column; align-items: flex-start; gap: 4px; align-self: end; }
+.close-actions .text-link { margin-top: 8px; }
+
+@media (max-width: 1099px) {
+  .maths-head, .units-head { grid-column: 1 / -1; position: static; margin-bottom: 40px; }
+  .formula, .unit-rows { grid-column: 1 / -1; }
+  .close-copy { grid-column: 1 / span 7; }
+  .close-actions { grid-column: 8 / span 5; }
+}
+@media (max-width: 699px) {
+  .stage-link { margin-left: 0; }
+  .formula li { padding: 20px; column-gap: 14px; grid-template-columns: 28px minmax(0, 1fr); }
+  .formula li::before { font-size: 13px; }
+  .unit-rows > div { grid-template-columns: 1fr; row-gap: 8px; padding: 20px; }
+  .close-grid { display: block; }
+  .close-actions { margin-top: 32px; }
+}
+
 /* ---------- Tablet ---------- */
 
 @media (max-width: 1099px) {
