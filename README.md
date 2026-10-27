@@ -175,7 +175,7 @@ If this repo doesn't have a remote yet, here's the full setup:
 
 ## Notes
 
-- No analytics, no cookies, and nothing is loaded from another domain: the fonts are self-hosted.
+- No cookies. The home and calculator pages load one third-party script, Umami (`cloud.umami.is`), which counts visits and clicks on the Google Play links; nothing else is loaded from another domain, and the fonts are self-hosted.
   The landing page runs a small script with no dependencies (`home.js` and `calc.js`), and the
   unsubscribe page calls the Supabase edge function. The legal pages use the system font stack.
   The landing page is about 140 KB on first load, most of it the two font files.
