@@ -1,5 +1,6 @@
 /* Peptidly landing page: the calculator, the Home screen demo, and the motion layer.
-   No dependencies, no network, nothing stored. Every part degrades to the static HTML. */
+   No dependencies, no network; the only thing stored is the visit-counting switch (see below). Every part degrades
+   to the static HTML. */
 import { parseDecimal, positive, drawTo, reconstitute } from './calc.js';
 import * as site from './picker.js';
 
@@ -151,6 +152,27 @@ import * as site from './picker.js';
     ripple.classList.remove('go');
     void ripple.getBoundingClientRect();
     ripple.classList.add('go');
+  }
+
+  /* ---------- Visit statistics: the way to object ---------- */
+
+  // Umami's script checks localStorage 'umami.disabled' before it sends anything, so this switch is the whole
+  // objection. Storage can throw (private windows, blocked storage); then the button stays hidden.
+  var countToggle = $('[data-count-toggle]');
+  if (countToggle) {
+    try {
+      var showCount = function () {
+        var off = localStorage.getItem('umami.disabled') === '1';
+        countToggle.textContent = off ? 'Count my visits again' : 'Don\'t count my visits';
+      };
+      showCount();
+      countToggle.hidden = false;
+      countToggle.addEventListener('click', function () {
+        if (localStorage.getItem('umami.disabled') === '1') localStorage.removeItem('umami.disabled');
+        else localStorage.setItem('umami.disabled', '1');
+        showCount();
+      });
+    } catch (err) { countToggle.hidden = true; }
   }
 
   /* ---------- The calculator ---------- */

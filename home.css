@@ -1184,6 +1184,19 @@ h2 {
   transition: color 160ms ease;
 }
 .foot-nav a:hover { color: var(--accent); }
+.count-toggle {
+  align-self: flex-start;
+  padding: 6px 0;
+  border: 0;
+  background: none;
+  color: var(--muted);
+  font: inherit;
+  font-size: var(--step-xs);
+  text-align: left;
+  cursor: pointer;
+  transition: color 160ms ease;
+}
+.count-toggle:hover { color: var(--accent); }
 .foot-mail a { display: inline-block; margin-top: 6px; font-size: var(--step-xs); font-weight: 600; text-decoration: none; overflow-wrap: anywhere; }
 .legal { margin-top: 20px; font-size: var(--step-xs); color: var(--muted); text-align: center; }
 
