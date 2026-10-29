@@ -176,6 +176,7 @@ If this repo doesn't have a remote yet, here's the full setup:
 ## Notes
 
 - No cookies. The home and calculator pages load one third-party script, Umami (`cloud.umami.is`), which counts visits and clicks on the Google Play links on `peptidly.co.uk` only (`data-domains`, so local test runs are not counted); nothing else is loaded from another domain, and the fonts are self-hosted.
+- Bing and other IndexNow engines are told about changed pages by `node scripts/indexnow.mjs` (run it after a deploy is live; it reads `sitemap.xml`). The `<32 hex>.txt` file at the root is the IndexNow key, public by design; do not delete it. Keep each page's `<lastmod>` in `sitemap.xml` current when the page changes.
   The landing page runs a small script with no dependencies (`home.js` and `calc.js`), and the
   unsubscribe page calls the Supabase edge function. The legal pages use the system font stack.
   The landing page is about 140 KB on first load, most of it the two font files.
