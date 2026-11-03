@@ -86,9 +86,11 @@ function escapeHtml(str) {
 }
 
 /**
- * Convert plain text body to HTML body. Uses the same heading detection as
- * the in-app LegalDocumentScreen renderer: a paragraph is a heading if it's
- * a single line, short (<80 chars), and entirely uppercase.
+ * Convert plain text body to HTML body. Uses the same heading rule as
+ * isLegalHeading in helix legal/sections.ts, which the in-app
+ * LegalDocumentScreen renders with: a paragraph is a heading if it's a single
+ * line, short (<80 chars), entirely uppercase and has a capital letter.
+ * Change both together.
  */
 function bodyToHtml(body) {
   const paragraphs = body.split(/\n\n+/);
