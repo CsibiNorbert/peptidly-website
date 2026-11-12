@@ -1609,6 +1609,9 @@ h2 {
 }
 /* Only with the script running does the screen follow the steps; without it the screens just sit beside them. */
 .js .guide-stage { position: sticky; top: 72px; }
+/* A screen wrapper never outgrows the stage, so a fixed-width replica inside it shrinks instead of overflowing. */
+.guide-stage > [data-screen] { max-width: 100%; display: flex; justify-content: center; }
+.guide-stage > [data-screen][hidden] { display: none; }
 .guide-where { min-height: 1.5em; color: var(--muted); font-size: var(--step-xs); text-align: center; }
 
 /* The ring: drawn by guide.js on the part of the screen the step in view describes. */
@@ -1629,8 +1632,9 @@ h2 {
   .js .guide-steps li { min-height: 30vh; align-content: start; }
 }
 /* A short window still shows the whole screen: the replica scales down with it. */
-@media (min-width: 1100px) and (max-height: 900px) { .guide-stage .phone { zoom: 0.88; } }
-@media (min-width: 1100px) and (max-height: 780px) { .guide-stage .phone { zoom: 0.74; } }
+@media (min-width: 1100px) and (max-height: 900px) { .guide-stage .phone, .guide-stage .picker { zoom: 0.88; } }
+@media (min-width: 1100px) and (max-height: 780px) { .guide-stage .phone, .guide-stage .picker { zoom: 0.74; } }
+@media (min-width: 1100px) and (max-height: 660px) { .guide-stage .phone, .guide-stage .picker { zoom: 0.62; } }
 @media (max-width: 1099px) {
   .guide-intro { grid-column: 1 / -1; grid-row: auto; padding-bottom: 32px; }
   .guide .guide-steps { grid-column: 1 / -1; grid-row: auto; order: 2; }
@@ -1663,3 +1667,4 @@ h2 {
 [data-ui] .picker [data-region] { padding: 4px 10px; }
 
 .section-link { margin-top: 24px; }
+[data-ui] .readout > [data-region] { outline-offset: 0; }
