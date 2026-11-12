@@ -87,5 +87,17 @@ for (const picked of keys.filter((k) => !OFF.includes(k))) {
   }
 }
 
+// The guide page carries the same generated map and the same picker block as the home page, so everything
+// checked above holds for it too.
+const guide = path.join(root, 'injection-site-rotation.html');
+if (!fs.existsSync(guide)) fails.push('injection-site-rotation.html is missing');
+else {
+  const guideHtml = fs.readFileSync(guide, 'utf8');
+  const mapOf = (h) => (h.replace(/\r\n/g, '\n').match(/<!-- body-map:start[\s\S]*?<!-- body-map:end -->/) || [])[0];
+  expect(mapOf(guideHtml) !== undefined && mapOf(guideHtml) === mapOf(html), 'injection-site-rotation.html: the body map differs from index.html (re-run build-body-map)');
+  const hint = `<p class="pick-hint" data-pick-hint>${en.injectionSites.bodyHintFront}</p>`;
+  expect(guideHtml.includes(hint), "injection-site-rotation.html: the hint under the map is not the app's");
+}
+
 if (fails.length) { console.error(fails.join('\n')); console.error(`${fails.length} difference(s)`); process.exit(1); }
 console.log(`site picker matches the app: suggestion ${NEXT}, ${keys.length} areas, ${keys.length - OFF.length} pickable, every pick checked`);

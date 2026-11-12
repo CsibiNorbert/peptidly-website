@@ -22,6 +22,10 @@
       Array.prototype.forEach.call(stage.querySelectorAll('[data-region]'), function (r) {
         r.classList.toggle('is-focus', r.getAttribute('data-region') === id);
       });
+      // A page with two screens (the dose screen, then Settings) shows the one the step is on.
+      var active = stage.querySelector('.is-focus');
+      var screen = active && active.closest('[data-screen]');
+      if (screen) Array.prototype.forEach.call(stage.querySelectorAll('[data-screen]'), function (s) { s.hidden = s !== screen; });
       if (label) label.textContent = step.getAttribute('data-where') || '';
     }
 

@@ -1646,3 +1646,17 @@ h2 {
 [data-ui] .field-static { flex: 1; min-width: 0; font-family: var(--mono); font-size: 15px; font-variant-numeric: tabular-nums; color: var(--ink); } /* taste-skill-ignore: app UI inside [data-ui] */
 /* Room for the ring around a readout cell. */
 [data-ui] .readout > [data-region] { padding: 6px 8px; margin: -6px -8px; }
+
+/* The Default sites still (injection-site-rotation): the app's segmented control and stepper. */
+[data-ui] .ds-block { margin: 12px -8px 0; padding: 8px; }
+[data-ui] .ds-head { margin-bottom: 8px; color: var(--muted); font-size: 11px; font-weight: 600; letter-spacing: 0.5px; text-transform: uppercase; }
+[data-ui] .ds-seg { display: grid; grid-template-columns: repeat(3, 1fr); gap: 4px; padding: 4px; border-radius: 12px; background: var(--surface); }
+[data-ui] .ds-opt { padding: 9px 0; border-radius: 9px; color: var(--muted); font-size: 14px; font-weight: 600; text-align: center; }
+[data-ui] .ds-opt.on { background: var(--teal-soft); color: var(--accent-hover); box-shadow: inset 0 0 0 1px var(--teal-line); }
+[data-ui] .ds-stepper { display: flex; align-items: center; gap: 14px; padding: 8px 12px; border-radius: 12px; background: var(--surface); }
+[data-ui] .ds-btn { display: grid; place-items: center; width: 32px; height: 32px; border-radius: 999px; background: var(--card-hi); color: var(--ink); font-size: 18px; font-weight: 600; }
+[data-ui] .ds-val { min-width: 2ch; font-family: var(--mono); font-size: 20px; font-weight: 700; text-align: center; } /* taste-skill-ignore: app UI inside [data-ui] */
+[data-ui] .ds-unit { color: var(--muted); font-size: 13px; }
+[data-ui] .ds-note { margin-top: 8px; padding-inline: 4px; color: var(--muted); font-size: 12px; line-height: 1.4; }
+/* Room for the ring around the picker's label and steer lines. */
+[data-ui] .picker [data-region] { padding: 4px 10px; }
