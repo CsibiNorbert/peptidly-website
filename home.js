@@ -336,7 +336,7 @@ import * as site from './picker.js';
 
   /* ---------- The Home screen demo ---------- */
 
-  var phone = $('.phone');
+  var phone = $('#home-demo');
   var rows = phone ? $$('.dose-row', phone) : [];
   // The page names no dose: the amounts on this screen are masked, and none is written here either.
   // A Log drops the row's vial by a plausible step (62.5 -> 50 %, 40 -> 30 %).

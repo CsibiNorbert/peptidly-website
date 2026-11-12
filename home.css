@@ -1573,7 +1573,6 @@ h2 {
 
 /* ---------- Guide pages: numbered steps beside the app screen they describe ---------- */
 
-.guide-intro { padding-top: clamp(32px, 6vh, 72px); padding-bottom: clamp(48px, 6vw, 96px); }
 .guide-intro h1 {
   max-width: 16ch;
   font-size: var(--step-xl);
@@ -1585,13 +1584,16 @@ h2 {
 .guide-intro .lead { max-width: 52ch; }
 
 .guide {
+  padding-top: clamp(32px, 6vh, 72px);
   display: grid;
   grid-template-columns: repeat(12, minmax(0, 1fr));
   column-gap: var(--col-gap);
   align-items: start;
   padding-bottom: var(--section);
 }
-.guide .guide-steps { grid-column: 1 / span 5; }
+.guide-intro { grid-column: 1 / span 6; grid-row: 1; padding-bottom: clamp(40px, 5vw, 72px); }
+.guide .guide-steps { grid-column: 1 / span 5; grid-row: 2; }
+.guide-steps li:last-child { margin-bottom: 30vh; }
 .guide-steps li { transition: background-color 200ms var(--ease-out); }
 .guide-steps li[aria-current="step"] { background: var(--card-hi); }
 .guide-steps li:focus-visible { outline-offset: -2px; border-radius: var(--radius); }
@@ -1599,12 +1601,13 @@ h2 {
 
 .guide-stage {
   grid-column: 7 / span 6;
+  grid-row: 1 / span 2;
   position: sticky;
-  top: 96px;
+  top: 72px;
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 16px;
+  gap: 10px;
 }
 .guide-where { min-height: 1.5em; color: var(--muted); font-size: var(--step-xs); text-align: center; }
 
@@ -1623,13 +1626,21 @@ h2 {
 [data-ui] .app-sub { margin-top: 2px; color: var(--muted); font-size: 13px; }
 
 @media (min-width: 1100px) {
-  .js .guide-steps li { min-height: 36vh; align-content: start; }
+  .js .guide-steps li { min-height: 30vh; align-content: start; }
 }
+/* A short window still shows the whole screen: the replica scales down with it. */
+@media (min-width: 1100px) and (max-height: 900px) { .guide-stage .phone { zoom: 0.88; } }
+@media (min-width: 1100px) and (max-height: 780px) { .guide-stage .phone { zoom: 0.74; } }
 @media (max-width: 1099px) {
-  .guide .guide-steps { grid-column: 1 / -1; }
-  .guide-stage { grid-column: 1 / -1; position: static; order: -1; margin-bottom: 40px; }
+  .guide-intro { grid-column: 1 / -1; grid-row: auto; padding-bottom: 32px; }
+  .guide .guide-steps { grid-column: 1 / -1; grid-row: auto; order: 2; }
+  .guide-steps li:last-child { margin-bottom: 0; }
+  .guide-stage { grid-column: 1 / -1; grid-row: auto; position: static; order: 1; margin-bottom: 40px; }
   .guide-where { display: none; }
 }
 @media (prefers-reduced-motion: reduce) {
   [data-ui] [data-region], .guide-steps li { transition: none; }
 }
+
+/* A field value in a still replica (the live calculator uses a real input here). */
+[data-ui] .field-static { flex: 1; min-width: 0; font-family: var(--mono); font-size: 15px; font-variant-numeric: tabular-nums; color: var(--ink); } /* taste-skill-ignore: app UI inside [data-ui] */

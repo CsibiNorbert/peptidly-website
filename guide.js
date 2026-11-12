@@ -26,11 +26,18 @@
     }
 
     steps.forEach(function (s) { s.addEventListener('focusin', function () { show(s); }); });
-    show(steps[0]);
-    if (!('IntersectionObserver' in window)) return;
-    var io = new IntersectionObserver(function (entries) {
-      entries.forEach(function (e) { if (e.isIntersecting) show(e.target); });
-    }, { rootMargin: '-35% 0px -50% 0px' });
-    steps.forEach(function (s) { io.observe(s); });
+    // The current step is the last one whose top has passed 45% of the window height.
+    var queued = false;
+    function pick() {
+      queued = false;
+      var line = window.innerHeight * 0.45;
+      var chosen = steps[0];
+      steps.forEach(function (s) { if (s.getBoundingClientRect().top <= line) chosen = s; });
+      show(chosen);
+    }
+    function queue() { if (!queued) { queued = true; window.requestAnimationFrame(pick); } }
+    window.addEventListener('scroll', queue, { passive: true });
+    window.addEventListener('resize', queue);
+    pick();
   });
 })();
