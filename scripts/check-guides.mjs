@@ -22,6 +22,10 @@ const titleOf = (h) => (h.match(/<title>([^<]*)<\/title>/) || [])[1];
 const others = fs.readdirSync(root).filter((f) => f.endsWith('.html') && !files.includes(f));
 const taken = new Map(others.map((f) => [titleOf(read(f)), f]));
 
+// The tag the policy describes, copied from the calculator page so the guides cannot drift from it.
+const UMAMI_TAG = (read('peptide-calculator.html').match(/<script defer src="https:\/\/cloud\.umami\.is[^>]*><\/script>/) || [])[0];
+if (!UMAMI_TAG) { console.error('peptide-calculator.html has no Umami tag to compare against'); process.exit(1); }
+
 const sitemap = read('sitemap.xml');
 const css = read('home.css');
 if (!fs.existsSync(path.join(root, 'guide.js'))) fail('guide.js', 'missing');
@@ -31,8 +35,19 @@ for (const f of files) {
   if (!fs.existsSync(path.join(root, f))) { fail(f, 'missing'); continue; }
   const h = read(f);
   const slug = f.replace(/\.html$/, '');
-  // The privacy policy names Umami on the home and calculator pages only; a guide must load nothing third-party.
-  if (/umami/i.test(h)) fail(f, 'loads or tags Umami (the privacy policy covers only the home and calculator pages)');
+  // The privacy policy (PRIVACY_LAST_UPDATED 2026-11-12) names the home page, the calculator page and the guide
+  // pages as the pages that load Umami, and says Play-link clicks are reported. So a guide loads Umami exactly as
+  // the calculator page does, and nothing else third-party; has the opt-out button; and tags every Play link.
+  if (!h.includes(UMAMI_TAG)) fail(f, 'does not carry the Umami tag exactly as peptide-calculator.html does');
+  for (const m of h.matchAll(/<script[^>]*\ssrc="(https?:[^"]+)"/g)) {
+    if (!m[1].startsWith('https://cloud.umami.is/')) fail(f, `third-party script ${m[1]} (the policy names only Umami)`);
+  }
+  if (!h.includes('data-count-toggle')) fail(f, 'no "Don\'t count my visits" button (data-count-toggle)');
+  const play = [...h.matchAll(/<a [^>]*href="https:\/\/play\.google\.com[^>]*>/g)].map((m) => m[0]);
+  if (play.length === 0) fail(f, 'no Google Play link');
+  for (const a of play) {
+    if (!a.includes('data-umami-event="Google Play"') || !/data-umami-event-placement="[a-z]+"/.test(a)) fail(f, `Play link without its Umami event: ${a.slice(0, 80)}`);
+  }
   const n1 = (h.match(/<h1[\s>]/g) || []).length;
   if (n1 !== 1) fail(f, `${n1} h1 elements, want 1`);
   const title = titleOf(h) || '';
