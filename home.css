@@ -1668,3 +1668,62 @@ h2 {
 
 .section-link { margin-top: 24px; }
 [data-ui] .readout > [data-region] { outline-offset: 0; }
+
+/* ---------- Header Guides menu: a <details>, so it opens without script ---------- */
+
+.nav-menu { position: relative; }
+.nav-menu summary {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 2px;
+  color: var(--muted);
+  font-size: var(--step-xs);
+  font-weight: 500;
+  list-style: none;
+  cursor: pointer;
+  transition: color 160ms ease;
+}
+.nav-menu summary::-webkit-details-marker { display: none; }
+.nav-menu summary::after {
+  content: "";
+  width: 6px;
+  height: 6px;
+  border-right: 2px solid currentColor;
+  border-bottom: 2px solid currentColor;
+  transform: translateY(-2px) rotate(45deg);
+  transition: transform 200ms var(--ease-out);
+}
+.nav-menu[open] summary::after { transform: translateY(1px) rotate(-135deg); }
+.nav-menu summary:hover, .nav-menu[open] summary { color: var(--ink); }
+.nav-menu:has([aria-current="page"]) summary { color: var(--ink); text-decoration: underline; text-decoration-thickness: 2px; text-underline-offset: 8px; }
+.nav-menu-list {
+  position: absolute;
+  top: calc(100% + 4px);
+  left: -14px;
+  z-index: 30;
+  display: grid;
+  gap: 2px;
+  min-width: 296px;
+  margin: 0;
+  padding: 8px;
+  list-style: none;
+  border-radius: var(--radius);
+  background: var(--card);
+  outline: 1px solid var(--line-hi);
+}
+.top-nav .nav-menu-list a {
+  display: block;
+  padding: 12px 16px;
+  border-radius: 12px;
+  color: var(--ink);
+  font-size: var(--step-xs);
+  font-weight: 500;
+}
+.top-nav .nav-menu-list a:hover { background: var(--card-hi); }
+.top-nav .nav-menu-list a[aria-current="page"] { background: var(--card-hi); font-weight: 700; text-decoration: none; }
+.nav-menu summary:focus-visible { border-radius: 6px; }
+.nav-menu-list a:focus-visible { outline-offset: -2px; border-radius: 12px; }
+@media (prefers-reduced-motion: reduce) {
+  .nav-menu summary::after { transition: none; }
+}

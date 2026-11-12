@@ -96,5 +96,19 @@ if (files.includes('syringe-units.html') && files.includes('water-volume-and-con
   else if (a !== b) fail('app-calc', 'the Calculator replica differs between syringe-units and water-volume-and-concentration');
 }
 
+// The header's Guides menu: on the home page, the calculator page and each guide, a <details> with the three guide
+// links in this order, and on a guide its own link marked aria-current="page".
+for (const f of ['index.html', 'peptide-calculator.html', ...SLUGS.map((s) => `${s}.html`)]) {
+  if (!fs.existsSync(path.join(root, f))) { fail(f, 'missing'); continue; }
+  const menu = (read(f).match(/<details class="nav-menu" data-nav-menu>[\s\S]*?<\/details>/) || [])[0];
+  if (!menu) { fail(f, 'no Guides menu (<details class="nav-menu" data-nav-menu>) in the header'); continue; }
+  if (!/<summary>Guides<\/summary>/.test(menu)) fail(f, 'the Guides menu has no <summary>Guides</summary>');
+  const hrefs = [...menu.matchAll(/<a [^>]*href="([^"]+)"/g)].map((m) => m[1]);
+  if (hrefs.join() !== SLUGS.map((s) => `/${s}`).join()) fail(f, `the Guides menu links ${hrefs.join(', ')}, want ${SLUGS.map((s) => `/${s}`).join(', ')}`);
+  const own = `/${f.replace(/\.html$/, '')}`;
+  const current = [...menu.matchAll(/<a [^>]*href="([^"]+)"[^>]*aria-current="page"|<a [^>]*aria-current="page"[^>]*href="([^"]+)"/g)].map((m) => m[1] || m[2]);
+  if (SLUGS.map((s) => `/${s}`).includes(own) ? current.join() !== own : current.length) fail(f, `aria-current in the Guides menu is [${current.join(', ')}] on ${own}`);
+}
+
 if (bad) { console.error(`${bad} problem(s) found`); process.exit(1); }
 console.log(`guides ok: ${files.length} page(s)`);
