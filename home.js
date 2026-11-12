@@ -756,4 +756,28 @@ import * as site from './picker.js';
       updateMotion();
     }).observe(vial);
   }
+
+  /* ---------- Header menus: one open at a time; Escape, a click elsewhere or tabbing out closes it ---------- */
+
+  var navMenus = $$('[data-nav-menu]');
+  if (navMenus.length) {
+    var closeMenus = function (except, returnFocus) {
+      navMenus.forEach(function (m) {
+        if (m !== except && m.open) {
+          m.open = false;
+          if (returnFocus) $('summary', m).focus();
+        }
+      });
+    };
+    navMenus.forEach(function (m) {
+      m.addEventListener('toggle', function () { if (m.open) closeMenus(m, false); });
+      m.addEventListener('focusout', function (e) { if (m.open && e.relatedTarget && !m.contains(e.relatedTarget)) m.open = false; });
+    });
+    document.addEventListener('click', function (e) {
+      navMenus.forEach(function (m) { if (m.open && !m.contains(e.target)) m.open = false; });
+    });
+    document.addEventListener('keydown', function (e) {
+      if (e.key === 'Escape') closeMenus(null, true);
+    });
+  }
 })();
