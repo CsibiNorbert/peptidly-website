@@ -56,6 +56,8 @@ for (const f of files) {
   taken.set(title, f);
   const desc = (h.match(/<meta name="description" content="([^"]*)"/) || [])[1] || '';
   if (desc.length < 120 || desc.length > 160) fail(f, `description is ${desc.length} chars, want 120-160`);
+  // The title already ends in the brand; repeating it in the description spends the snippet on our own name.
+  if (/peptidly/i.test(desc)) fail(f, 'the description repeats the brand name (the title carries it)');
   const url = `https://peptidly.co.uk/${slug}`;
   if (!h.includes(`<link rel="canonical" href="${url}">`)) fail(f, `canonical is not ${url}`);
   if (!h.includes(`<meta property="og:url" content="${url}">`)) fail(f, 'og:url is not the canonical');
