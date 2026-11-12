@@ -108,6 +108,25 @@ for (const f of ['index.html', 'peptide-calculator.html', ...SLUGS.map((s) => `$
   const own = `/${f.replace(/\.html$/, '')}`;
   const current = [...menu.matchAll(/<a [^>]*href="([^"]+)"[^>]*aria-current="page"|<a [^>]*aria-current="page"[^>]*href="([^"]+)"/g)].map((m) => m[1] || m[2]);
   if (SLUGS.map((s) => `/${s}`).includes(own) ? current.join() !== own : current.length) fail(f, `aria-current in the Guides menu is [${current.join(', ')}] on ${own}`);
+
+  // Below 1100px the header nav is hidden, so a Menu button (a <details>) carries the same links in the same
+  // order, the guides listed flat. The footer carries the three guides too, for crawlers and for the end of a page.
+  const html = read(f);
+  const topNav = (html.match(/<nav class="top-nav"[\s\S]*?<\/nav>/) || [])[0] || '';
+  const mobile = (html.match(/<details class="m-menu" data-nav-menu>[\s\S]*?<\/details>/) || [])[0];
+  if (!mobile) fail(f, 'no mobile menu (<details class="m-menu" data-nav-menu>)');
+  else {
+    if (!/<summary[^>]*>[\s\S]*?Menu[\s\S]*?<\/summary>/.test(mobile)) fail(f, 'the mobile menu button does not say Menu');
+    const want = [...topNav.matchAll(/<a [^>]*href="([^"]+)"/g)].map((m) => m[1]);
+    const got = [...mobile.matchAll(/<a [^>]*href="([^"]+)"/g)].map((m) => m[1]);
+    if (want.join() !== got.join()) fail(f, `the mobile menu links [${got.join(', ')}] differ from the header nav [${want.join(', ')}]`);
+    const mobileCurrent = [...mobile.matchAll(/<a [^>]*aria-current="page"[^>]*>/g)].length;
+    const navCurrent = [...topNav.matchAll(/<a [^>]*aria-current="page"[^>]*>/g)].length;
+    if (mobileCurrent !== navCurrent) fail(f, `aria-current appears ${mobileCurrent} times in the mobile menu, ${navCurrent} in the header nav`);
+  }
+  const foot = (html.match(/<nav class="foot-nav foot-guides" aria-label="Guides">[\s\S]*?<\/nav>/) || [])[0];
+  if (!foot) fail(f, 'no Guides links in the footer (<nav class="foot-nav foot-guides" aria-label="Guides">)');
+  else if ([...foot.matchAll(/<a [^>]*href="([^"]+)"/g)].map((m) => m[1]).join() !== SLUGS.map((s) => `/${s}`).join()) fail(f, 'the footer Guides links are not the three guides, in order');
 }
 
 if (bad) { console.error(`${bad} problem(s) found`); process.exit(1); }
