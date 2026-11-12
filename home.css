@@ -1660,3 +1660,5 @@ h2 {
 [data-ui] .ds-note { margin-top: 8px; padding-inline: 4px; color: var(--muted); font-size: 12px; line-height: 1.4; }
 /* Room for the ring around the picker's label and steer lines. */
 [data-ui] .picker [data-region] { padding: 4px 10px; }
+
+.section-link { margin-top: 24px; }
