@@ -31,6 +31,8 @@ for (const f of files) {
   if (!fs.existsSync(path.join(root, f))) { fail(f, 'missing'); continue; }
   const h = read(f);
   const slug = f.replace(/\.html$/, '');
+  // The privacy policy names Umami on the home and calculator pages only; a guide must load nothing third-party.
+  if (/umami/i.test(h)) fail(f, 'loads or tags Umami (the privacy policy covers only the home and calculator pages)');
   const n1 = (h.match(/<h1[\s>]/g) || []).length;
   if (n1 !== 1) fail(f, `${n1} h1 elements, want 1`);
   const title = titleOf(h) || '';

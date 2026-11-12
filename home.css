@@ -1602,13 +1602,13 @@ h2 {
 .guide-stage {
   grid-column: 7 / span 6;
   grid-row: 1 / span 2;
-  position: sticky;
-  top: 72px;
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: 10px;
 }
+/* Only with the script running does the screen follow the steps; without it the screens just sit beside them. */
+.js .guide-stage { position: sticky; top: 72px; }
 .guide-where { min-height: 1.5em; color: var(--muted); font-size: var(--step-xs); text-align: center; }
 
 /* The ring: drawn by guide.js on the part of the screen the step in view describes. */
@@ -1635,7 +1635,8 @@ h2 {
   .guide-intro { grid-column: 1 / -1; grid-row: auto; padding-bottom: 32px; }
   .guide .guide-steps { grid-column: 1 / -1; grid-row: auto; order: 2; }
   .guide-steps li:last-child { margin-bottom: 0; }
-  .guide-stage { grid-column: 1 / -1; grid-row: auto; position: static; order: 1; margin-bottom: 40px; }
+  .guide-stage { grid-column: 1 / -1; grid-row: auto; order: 1; margin-bottom: 40px; }
+  .js .guide-stage { position: static; }
   .guide-where { display: none; }
 }
 @media (prefers-reduced-motion: reduce) {
@@ -1651,7 +1652,7 @@ h2 {
 [data-ui] .ds-block { margin: 12px -8px 0; padding: 8px; }
 [data-ui] .ds-head { margin-bottom: 8px; color: var(--muted); font-size: 11px; font-weight: 600; letter-spacing: 0.5px; text-transform: uppercase; }
 [data-ui] .ds-seg { display: grid; grid-template-columns: repeat(3, 1fr); gap: 4px; padding: 4px; border-radius: 12px; background: var(--surface); }
-[data-ui] .ds-opt { padding: 9px 0; border-radius: 9px; color: var(--muted); font-size: 14px; font-weight: 600; text-align: center; }
+[data-ui] .ds-opt { padding: 9px 12px; border-radius: 9px; color: var(--muted); font-size: 14px; font-weight: 600; text-align: center; }
 [data-ui] .ds-opt.on { background: var(--teal-soft); color: var(--accent-hover); box-shadow: inset 0 0 0 1px var(--teal-line); }
 [data-ui] .ds-stepper { display: flex; align-items: center; gap: 14px; padding: 8px 12px; border-radius: 12px; background: var(--surface); }
 [data-ui] .ds-btn { display: grid; place-items: center; width: 32px; height: 32px; border-radius: 999px; background: var(--card-hi); color: var(--ink); font-size: 18px; font-weight: 600; }
