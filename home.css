@@ -1570,3 +1570,66 @@ h2 {
   [data-ui] .t-chip:active, [data-ui] .v-chip:active { transform: none; }
   .pm::after { transition-duration: 1ms; }
 }
+
+/* ---------- Guide pages: numbered steps beside the app screen they describe ---------- */
+
+.guide-intro { padding-top: clamp(32px, 6vh, 72px); padding-bottom: clamp(48px, 6vw, 96px); }
+.guide-intro h1 {
+  max-width: 16ch;
+  font-size: var(--step-xl);
+  font-weight: 800;
+  line-height: 0.98;
+  letter-spacing: -0.035em;
+  text-wrap: balance;
+}
+.guide-intro .lead { max-width: 52ch; }
+
+.guide {
+  display: grid;
+  grid-template-columns: repeat(12, minmax(0, 1fr));
+  column-gap: var(--col-gap);
+  align-items: start;
+  padding-bottom: var(--section);
+}
+.guide .guide-steps { grid-column: 1 / span 5; }
+.guide-steps li { transition: background-color 200ms var(--ease-out); }
+.guide-steps li[aria-current="step"] { background: var(--card-hi); }
+.guide-steps li:focus-visible { outline-offset: -2px; border-radius: var(--radius); }
+.guide-at { margin-top: 12px; color: var(--muted); font-size: 13px; line-height: 1.4; }
+
+.guide-stage {
+  grid-column: 7 / span 6;
+  position: sticky;
+  top: 96px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+}
+.guide-where { min-height: 1.5em; color: var(--muted); font-size: var(--step-xs); text-align: center; }
+
+/* The ring: drawn by guide.js on the part of the screen the step in view describes. */
+[data-ui] [data-region] {
+  border-radius: 14px;
+  outline: 2px solid transparent;
+  outline-offset: 4px;
+  transition: outline-color 240ms var(--ease-out);
+}
+[data-ui] [data-region].is-focus { outline-color: var(--accent); }
+
+/* The Calculator screen header, as the app draws it. */
+[data-ui] .app-head { margin-bottom: 14px; }
+[data-ui] .app-title { font-size: 24px; font-weight: 800; letter-spacing: -0.5px; color: var(--ink); }
+[data-ui] .app-sub { margin-top: 2px; color: var(--muted); font-size: 13px; }
+
+@media (min-width: 1100px) {
+  .js .guide-steps li { min-height: 36vh; align-content: start; }
+}
+@media (max-width: 1099px) {
+  .guide .guide-steps { grid-column: 1 / -1; }
+  .guide-stage { grid-column: 1 / -1; position: static; order: -1; margin-bottom: 40px; }
+  .guide-where { display: none; }
+}
+@media (prefers-reduced-motion: reduce) {
+  [data-ui] [data-region], .guide-steps li { transition: none; }
+}
