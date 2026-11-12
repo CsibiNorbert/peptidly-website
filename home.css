@@ -1169,12 +1169,12 @@ h2 {
   row-gap: 28px;
   align-items: start;
 }
-.foot-statement { grid-column: span 6; }
+.foot-statement { grid-column: span 4; }
 .foot-brand { display: flex; width: fit-content; margin-bottom: 20px; }
 .foot-statement p:first-of-type { font-size: var(--step-s); font-weight: 600; line-height: 1.4; color: var(--ink); max-width: 44ch; }
 .foot-statement .small { margin-top: 10px; max-width: 52ch; }
 .foot-nav { grid-column: span 3; display: flex; flex-direction: column; gap: 4px; }
-.foot-mail { grid-column: span 3; }
+.foot-mail { grid-column: span 2; }
 .small { font-size: var(--step-xs); color: var(--muted); line-height: 1.45; }
 .foot-nav a {
   color: var(--ink);
@@ -1726,4 +1726,93 @@ h2 {
 .nav-menu-list a:focus-visible { outline-offset: -2px; border-radius: 12px; }
 @media (prefers-reduced-motion: reduce) {
   .nav-menu summary::after { transition: none; }
+}
+
+/* ---------- Mobile menu (below 1100px, where the header nav is hidden): a <details> with the nav's links ---------- */
+
+.m-menu { display: none; }
+.m-ico-close, .m-label-close { display: none; }
+.m-menu[open] .m-ico-menu, .m-menu[open] .m-label-open { display: none; }
+.m-menu[open] .m-ico-close { display: block; }
+.m-menu[open] .m-label-close { display: inline; }
+
+@media (max-width: 1099px) {
+  .top { position: relative; }
+  .m-menu { display: block; margin-left: auto; }
+  .m-menu summary {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    min-height: 44px;
+    padding: 0 14px;
+    border-radius: 999px;
+    color: var(--ink);
+    font-size: var(--step-xs);
+    font-weight: 600;
+    list-style: none;
+    cursor: pointer;
+    transition: background-color 160ms ease;
+  }
+  .m-menu summary::-webkit-details-marker { display: none; }
+  .m-menu summary:hover, .m-menu[open] summary { background: var(--card); }
+  .m-menu summary:focus-visible { border-radius: 999px; }
+  .m-ico { width: 20px; height: 20px; flex: none; }
+
+  .m-panel {
+    position: absolute;
+    top: calc(100% + 4px);
+    left: var(--margin);
+    right: var(--margin);
+    z-index: 30;
+    display: grid;
+    gap: 2px;
+    max-height: calc(100svh - 88px);
+    padding: 8px;
+    overflow-y: auto;
+    border-radius: var(--radius);
+    background: var(--card);
+    outline: 1px solid var(--line-hi);
+    animation: m-in 200ms var(--ease-out);
+  }
+  .m-panel a {
+    display: flex;
+    align-items: center;
+    min-height: 52px;
+    padding: 0 16px;
+    border-radius: 12px;
+    color: var(--ink);
+    font-size: 17px;
+    font-weight: 500;
+    text-decoration: none;
+    transition: background-color 160ms ease;
+  }
+  .m-panel a:hover, .m-panel a:active { background: var(--card-hi); }
+  .m-panel a[aria-current="page"] { background: var(--card-hi); font-weight: 700; }
+  .m-panel a:focus-visible { outline-offset: -2px; border-radius: 12px; }
+  .m-links { display: grid; gap: 2px; }
+  .m-group { padding: 14px 16px 4px; color: var(--muted); font-size: 13px; font-weight: 600; }
+  .m-panel .m-sub { padding-left: 28px; }
+}
+@keyframes m-in {
+  from { opacity: 0; transform: translateY(-6px); }
+  to { opacity: 1; transform: none; }
+}
+@media (max-width: 479px) {
+  .top { gap: 6px; }
+  .brand { gap: 10px; }
+  .wordmark { font-size: 13px; letter-spacing: 2.5px; }
+  .top .btn-small { padding-inline: 14px; font-size: 14px; white-space: nowrap; }
+  .m-menu summary { gap: 6px; padding: 0 8px; font-size: 14px; }
+}
+@media (max-width: 359px) {
+  .wordmark { letter-spacing: 1.5px; }
+  .top .btn-small { padding-inline: 12px; }
+}
+/* On the narrowest phones the button keeps its icon and the word stays for screen readers. */
+@media (max-width: 339px) {
+  .m-menu .m-label { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+  .m-menu summary { padding: 0 12px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .m-panel { animation: none; }
 }

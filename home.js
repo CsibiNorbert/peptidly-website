@@ -771,6 +771,7 @@ import * as site from './picker.js';
     };
     navMenus.forEach(function (m) {
       m.addEventListener('toggle', function () { if (m.open) closeMenus(m, false); });
+      m.addEventListener('click', function (e) { if (e.target.closest && e.target.closest('a')) m.open = false; });
       m.addEventListener('focusout', function (e) { if (m.open && e.relatedTarget && !m.contains(e.relatedTarget)) m.open = false; });
     });
     document.addEventListener('click', function (e) {
@@ -779,5 +780,6 @@ import * as site from './picker.js';
     document.addEventListener('keydown', function (e) {
       if (e.key === 'Escape') closeMenus(null, true);
     });
+    if (desktopWidth.addEventListener) desktopWidth.addEventListener('change', function () { closeMenus(null, false); });
   }
 })();
