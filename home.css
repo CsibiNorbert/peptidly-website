@@ -1644,3 +1644,5 @@ h2 {
 
 /* A field value in a still replica (the live calculator uses a real input here). */
 [data-ui] .field-static { flex: 1; min-width: 0; font-family: var(--mono); font-size: 15px; font-variant-numeric: tabular-nums; color: var(--ink); } /* taste-skill-ignore: app UI inside [data-ui] */
+/* Room for the ring around a readout cell. */
+[data-ui] .readout > [data-region] { padding: 6px 8px; margin: -6px -8px; }
